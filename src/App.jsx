@@ -1,10 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  "https://jmddyrmvicpmyawhjybe.supabase.co",
-  "sb_publishable_TpoXUuvsBQeqE1MS-CQ5rg_2DCFIdbH"
-);
+const SUPABASE_URL = "https://jmddyrmvicpmyawhjybe.supabase.co";
+const SUPABASE_KEY = "sb_publishable_TpoXUuvsBQeqE1MS-CQ5rg_2DCFIdbH";
+
 const QUESTIONS = [
   { id:1, dim:"stress", weight:1.2, text:"考试前三天，你通常会：", options:[
     {label:"高强度复习，失眠但可以接受",score:5},{label:"有计划复习，睡眠略差但还好",score:3},
@@ -796,18 +794,22 @@ function ResultScreen({ answers, excluded, onRestart }) {
     EXCLUDE_CATEGORIES.filter(c=>excluded.includes(c.id)).flatMap(c=>c.majors)
   );
 
-  useEffect(() => {
-    const topMatchesData = ranked
-      .filter(r => r.level === "high" && !excludedMajorIds.has(r.major.id))
-      .slice(0, 5)
-      .map(r => ({ name: r.major.name, score: r.rawScore }));
-    supabase.from("responses").insert({
-      answers,
-      profile,
-      top_matches: topMatchesData,
-      excluded
-    });
-  }, []);
+useEffect(() => {
+  const topMatchesData = ranked
+    .filter(r => r.level === "high" && !excludedMajorIds.has(r.major.id))
+    .slice(0, 5)
+    .map(r => ({ name: r.major.name, score: r.rawScore }));
+  fetch(SUPABASE_URL + "/rest/v1/responses", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_KEY,
+      "Authorization": "Bearer " + SUPABASE_KEY,
+      "Prefer": "return=minimal"
+    },
+    body: JSON.stringify({ answers, profile, top_matches: topMatchesData, excluded })
+  });
+}, []);
 
   const topMatches = ranked.filter(r=>r.level==="high" && !excludedMajorIds.has(r.major.id));
   const midMatches = ranked.filter(r=>r.level==="medium" && !excludedMajorIds.has(r.major.id));

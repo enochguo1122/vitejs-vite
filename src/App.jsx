@@ -564,7 +564,7 @@ const btn = (variant) => ({
 function Welcome({ onStart }) {
   return (
     <div style={{maxWidth:760,margin:"0 auto",padding:"4rem 1.5rem 2rem",textAlign:"center"}}>
-      <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.accent}`,color:C.accentLight,letterSpacing:2,marginBottom:"1rem"}}>专业方向测评系统 v1.0</div>
+      <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.accent}`,color:C.accentLight,letterSpacing:2,marginBottom:"1rem"}}>专业方向测评系统 v1.1</div>
       <h1 style={{fontSize:"clamp(1.6rem,4vw,2.4rem)",fontWeight:700,color:C.text,lineHeight:1.2,margin:"0 0 1rem"}}>不是兴趣测试<br/>是长期现实兼容性评估</h1>
       <p style={{color:C.muted,maxWidth:480,margin:"0 auto 1.5rem",lineHeight:1.8,fontSize:"0.9rem"}}>
         基于 <span style={{color:C.accentLight}}>6个核心维度 + 学业能力门槛</span>：压力耐受 / 确定性偏好 / 社交能量 / 执行耐心 / 现实资源 / 意义锚点。

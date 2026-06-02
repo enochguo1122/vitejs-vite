@@ -55,9 +55,12 @@ const QUESTIONS = [
   { id:16, dim:"social", weight:0.9, text:"你在陌生人群体中自我介绍，通常：", options:[
     {label:"主动出击，轻松搭讪",score:5},{label:"等别人开口，然后接上话",score:3},
     {label:"有点尴尬，但能撑过去",score:2},{label:"非常不舒服，尽量避免",score:1}]},
-  { id:17, dim:"patience", weight:1.2, text:"重复做同一类任务（如反复校对、反复实验），你的耐受极限是：", options:[
-    {label:"可以做很久，这种感觉让我安心",score:5},{label:"几天后开始厌倦，但还能继续",score:3},
-    {label:"一天后就开始找新刺激",score:2},{label:"几乎无法重复做同一件事",score:1}]},
+  { id:17, dim:"patience", weight:1.2, text:"重复做同一类任务（如反复校对、反复实验、反复练习），你的耐受极限大概是：", options:[
+    {label:"几周甚至更久，重复让我有一种踏实感",score:5},
+    {label:"大概一周，之后开始厌倦但还能继续",score:4},
+    {label:"两三天，之后效率和专注度明显下降",score:3},
+    {label:"半天到一天，之后强烈想换任务",score:2},
+    {label:"几乎无法接受重复，强迫自己做也很痛苦",score:1}]},
   { id:18, dim:"patience", weight:1.1, text:"你是否能接受一个需要5年才能出成果的研究方向？", options:[
     {label:"完全可以，我有这种耐心",score:5},{label:"可以，但需要阶段性里程碑",score:3},
     {label:"很难，我需要更快的成果",score:2},{label:"不可能，我需要即时回报",score:1}]},
@@ -116,9 +119,12 @@ const QUESTIONS = [
     {label:"还行，但每隔一段时间需要起来动一动",score:3},
     {label:"比较难受，我需要经常换环境或走动",score:2},
     {label:"很难接受，久坐让我非常烦躁",score:1}]},
-  { id:33, dim:"stress", weight:1.0, text:"你能接受工作中生死攸关类的压力吗（如医生、飞行员）？", options:[
-    {label:"可以，这让我感到生命意义",score:5},{label:"可以在可控范围内承受",score:3},
-    {label:"很难，这种压力会压垮我",score:1},{label:"完全无法接受，太沉重了",score:0}]},
+  { id:33, dim:"stress", weight:1.0, text:"你能接受工作中生死攸关类的压力吗（如医生、飞行员、急救人员）？", options:[
+    {label:"可以，这种责任感让我感到职业意义",score:5},
+    {label:"理性上可以，但需要较长时间适应",score:3},
+    {label:"勉强能接受，但会持续消耗我的心理能量",score:2},
+    {label:"很难，这种量级的压力会压垮我",score:1},
+    {label:"完全无法接受，我需要回避这类场景",score:0}]},
   { id:34, dim:"certainty", weight:1.0, text:"对于你的工作成果很难被量化评估，你的感受是：", options:[
     {label:"无所谓，我知道自己做了什么",score:1},{label:"有些不安，但能接受",score:3},
     {label:"很焦虑，我需要数字来证明自己",score:5},{label:"会主动设计指标来衡量自己",score:4}]},
@@ -159,11 +165,11 @@ const QUESTIONS = [
     {label:"偏弱，文字表达让我有些吃力",score:2},
     {label:"很差，写作是我的明显短板",score:1}]},
   { id:44, dim:"academic_eng", weight:1.2, text:"你的英语能力（读/写/听/说综合）大致是：", options:[
-    {label:"母语级别或接近母语，流利无障碍",score:5},
-    {label:"很强，能流利读写英文学术资料",score:5},
-    {label:"中上，基本能看懂英文文献和课程",score:4},
-    {label:"中等，日常交流可以，学术英语有挑战",score:3},
-    {label:"偏弱，英语是我的短板",score:2}]},
+    {label:"接近母语，能无障碍读写英文学术资料和演讲",score:5},
+    {label:"较强，能流利读懂英文课程和文献，口语有口音但流畅",score:4},
+    {label:"中等，日常交流没问题，读学术英语需要查词典",score:3},
+    {label:"偏弱，看英文资料比较吃力，写作错误较多",score:2},
+    {label:"很弱，英语是我明显的短板，基本靠翻译",score:1}]},
   { id:45, dim:"academic_avg", weight:1.5, text:"你的总体学业成绩（GPA/高考/IB分数等）在同龄人中的位置大约是：", options:[
     {label:"前5%，属于顶尖学生",score:5},
     {label:"前20%，成绩良好",score:4},
@@ -214,10 +220,10 @@ const QUESTIONS = [
     {label:"家庭意见是我做决定的主要依据",score:1}]},
   { id:53, dim:"resource", weight:1.0, text:"你希望未来工作的城市/地区是：", options:[
     {label:"欧美顶级城市（纽约/伦敦/旧金山等）",score:5},
-    {label:"亚洲国际城市（新加坡/东京/香港/首尔等）",score:5},
-    {label:"中国一线城市（北上广深）",score:4},
-    {label:"本国其他大城市或省会",score:3},
-    {label:"还没想好，哪里机会好去哪里",score:4}]},
+    {label:"亚洲国际城市（新加坡/东京/香港/首尔等）",score:4},
+    {label:"中国一线城市（北上广深）或本国最大城市",score:3},
+    {label:"本国其他大城市或省会",score:2},
+    {label:"还没想好，完全跟着机会走",score:4}]},
   { id:54, dim:"meaning", weight:1.0, text:"对你来说，选专业最重要的是：", options:[
     {label:"未来能赚到钱，经济稳定",score:2},
     {label:"做自己感兴趣的事",score:4},
@@ -557,7 +563,7 @@ function NameScreen({ onConfirm }) {
 function Welcome({ onStart }) {
   return (
     <div style={{maxWidth:760,margin:"0 auto",padding:"4rem 1.5rem 2rem",textAlign:"center"}}>
-      <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.accent}`,color:C.accentLight,letterSpacing:2,marginBottom:"1rem"}}>专业方向测评系统 v1.1</div>
+      <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.accent}`,color:C.accentLight,letterSpacing:2,marginBottom:"1rem"}}>专业方向测评系统 v1.2</div>
       <h1 style={{fontSize:"clamp(1.6rem,4vw,2.4rem)",fontWeight:700,color:C.text,lineHeight:1.2,margin:"0 0 1rem"}}>不是兴趣测试<br/>是长期现实兼容性评估</h1>
       <p style={{color:C.muted,maxWidth:480,margin:"0 auto 1.5rem",lineHeight:1.8,fontSize:"0.9rem"}}>
         基于 <span style={{color:C.accentLight}}>6个核心维度 + 学业能力门槛</span>：压力耐受 / 确定性偏好 / 社交能量 / 执行耐心 / 现实资源 / 意义锚点。
@@ -731,13 +737,15 @@ const EXCLUDE_CATEGORIES = [
   { id:"bio_env", label:"生命科学/环境类（长期科研路径）", majors:["biotech","env_sci"] },
 ];
 
-function ExcludeScreen({ onConfirm }) {
-  const [excluded, setExcluded] = useState([]);
+function ExcludeScreen({ onConfirm, initialExcluded = [], onBack = null }) {
+  const [excluded, setExcluded] = useState(initialExcluded);
   const toggle = (id) => setExcluded(e => e.includes(id) ? e.filter(x=>x!==id) : [...e,id]);
   return (
     <div style={{maxWidth:760,margin:"0 auto",padding:"2rem 1.5rem"}}>
       <div style={{marginBottom:"1.5rem"}}>
-        <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.gold}`,color:C.gold,letterSpacing:2,marginBottom:"0.8rem"}}>最后一步</div>
+        <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.gold}`,color:C.gold,letterSpacing:2,marginBottom:"0.8rem"}}>
+          {onBack ? "修改排除选项" : "最后一步"}
+        </div>
         <h2 style={{fontSize:"1.3rem",fontWeight:700,color:C.text,margin:"0 0 0.5rem"}}>有没有你直接排除的方向？</h2>
         <p style={{color:C.muted,fontSize:"0.85rem",margin:0,lineHeight:1.7}}>
           不管系统怎么算，你有没有"这个方向我完全不考虑"的领域？<br/>
@@ -770,7 +778,10 @@ function ExcludeScreen({ onConfirm }) {
           );
         })}
       </div>
-      <div style={{display:"flex",gap:12,justifyContent:"center"}}>
+      <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
+        {onBack && (
+          <button onClick={onBack} style={btn("outline")}>← 返回结果页</button>
+        )}
         <button onClick={()=>onConfirm([])} style={btn("outline")}>不排除任何方向，直接看结果</button>
         <button onClick={()=>onConfirm(excluded)} style={{...btn("primary"),opacity:excluded.length>0?1:0.6}}>
           {excluded.length>0 ? `排除 ${excluded.length} 类，查看结果 →` : "确认并查看结果 →"}
@@ -888,7 +899,7 @@ function PotentialMatches({ ranked, excludedMajorIds }) {
   );
 }
 
-function ResultScreen({ answers, excluded, userName, onRestart }) {
+function ResultScreen({ answers, excluded, userName, onRestart, onEditExclude }) {
   const profile = computeUserProfile(answers);
   const ranked = matchMajors(profile);
 
@@ -987,9 +998,24 @@ function ResultScreen({ answers, excluded, userName, onRestart }) {
         <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.accent}`,color:C.accentLight,letterSpacing:2,marginBottom:"0.5rem"}}>测评完成</div>
         <h2 style={{fontSize:"1.5rem",fontWeight:700,margin:"0.3rem 0",color:C.text}}>{userName} 的专业方向报告</h2>
         <p style={{color:C.muted,fontSize:"0.85rem",margin:0}}>基于长期现实兼容性模型 · 30个专业 · 含学业门槛过滤</p>
-        {excluded.length>0&&(
-          <div style={{marginTop:"0.6rem",fontSize:11,color:C.gold}}>
-            已根据你的排除选择过滤掉 {excludedMajorIds.size} 个专业方向
+        {excluded.length > 0 ? (
+          <div style={{marginTop:"0.8rem",background:`${C.danger}0f`,border:`1px solid ${C.danger}33`,borderRadius:6,padding:"0.7rem 1rem",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
+            <div>
+              <span style={{fontSize:11,color:C.danger,fontWeight:600,marginRight:8}}>已排除 {excludedMajorIds.size} 个专业方向</span>
+              <span style={{fontSize:11,color:C.muted}}>
+                {EXCLUDE_CATEGORIES.filter(c=>excluded.includes(c.id)).map(c=>c.label.split('（')[0]).join(' · ')}
+              </span>
+            </div>
+            <button onClick={onEditExclude} style={{...btn("outline"),fontSize:11,padding:"3px 12px",borderColor:C.danger,color:C.danger,flexShrink:0}}>
+              修改排除 →
+            </button>
+          </div>
+        ) : (
+          <div style={{marginTop:"0.8rem",display:"flex",alignItems:"center",gap:10}}>
+            <span style={{fontSize:11,color:C.muted}}>未排除任何方向</span>
+            <button onClick={onEditExclude} style={{...btn("outline"),fontSize:11,padding:"3px 12px"}}>
+              设置排除范围 →
+            </button>
           </div>
         )}
       </div>
@@ -1109,6 +1135,7 @@ export default function App() {
   };
   const handlePrev = () => { if(qIndex>0){setQIndex(i=>i-1);scrollTop();} };
   const handleConfirmExclude = (ex) => { setExcluded(ex); setScreen("result"); scrollTop(); };
+  const handleEditExclude = () => { setScreen("exclude"); scrollTop(); };
   const handleRestart = () => { setScreen("welcome"); setQIndex(0); setAnswers({}); setExcluded([]); setUserName(""); scrollTop(); };
 
   const progress = screen==="quiz" ? ((qIndex+1)/QUESTIONS.length)*100 :
@@ -1133,8 +1160,8 @@ export default function App() {
       {screen==="welcome"&&<Welcome onStart={()=>setScreen("name")}/>}
       {screen==="name"&&<NameScreen onConfirm={(n)=>{setUserName(n);setScreen("quiz");scrollTop();}}/>}
       {screen==="quiz"&&<QuestionPage qIndex={qIndex} answers={answers} onAnswer={handleAnswer} onNext={handleNext} onPrev={handlePrev}/>}
-      {screen==="exclude"&&<ExcludeScreen onConfirm={handleConfirmExclude}/>}
-      {screen==="result"&&<ResultScreen answers={answers} excluded={excluded} userName={userName} onRestart={handleRestart}/>}
+      {screen==="exclude"&&<ExcludeScreen onConfirm={handleConfirmExclude} initialExcluded={excluded} onBack={excluded.length>0||answers[1]!==undefined ? ()=>{setScreen("result");scrollTop();} : null}/>}
+      {screen==="result"&&<ResultScreen answers={answers} excluded={excluded} userName={userName} onRestart={handleRestart} onEditExclude={handleEditExclude}/>}
     </div>
   );
 }

@@ -3,6 +3,9 @@ import { useState, useRef, useEffect } from "react";
 const SUPABASE_URL = "https://jmddyrmvicpmyawhjybe.supabase.co";
 const SUPABASE_KEY = "sb_publishable_TpoXUuvsBQeqE1MS-CQ5rg_2DCFIdbH";
 
+// ── 班级列表：新增班级只需在这里加一行 ──
+const CLASSES = ["Eagles", "Harp", "Lamp"];
+
 const QUESTIONS = [
   { id:1, dim:"stress", weight:1.2, text:"考试前三天，你通常会：", options:[
     {label:"高强度复习，失眠但可以接受",score:5},{label:"有计划复习，睡眠略差但还好",score:3},
@@ -544,12 +547,14 @@ const btn = (variant) => ({
 
 function NameScreen({ onConfirm }) {
   const [name, setName] = useState("");
-  // ── FIX 建议5：重复提交检测——同一姓名5分钟内再次提交时警告 ──
+  const [className, setClassName] = useState("");
   const [dupWarning, setDupWarning] = useState(false);
   const [checking, setChecking] = useState(false);
 
-  const handleConfirm = async (n) => {
-    if (!n.trim()) return;
+  const canProceed = name.trim() && className;
+
+  const handleConfirm = async (n, cls) => {
+    if (!n.trim() || !cls) return;
     setChecking(true);
     try {
       const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
@@ -563,53 +568,61 @@ function NameScreen({ onConfirm }) {
         setChecking(false);
         return;
       }
-    } catch (_) { /* 查询失败则放行 */ }
+    } catch (_) {}
     setChecking(false);
-    onConfirm(n.trim());
+    onConfirm(n.trim(), cls);
+  };
+
+  const inputStyle = {
+    width:"100%", padding:"0.8rem 1rem",
+    background:C.card, border:`1px solid ${C.border}`,
+    borderRadius:6, color:C.text, fontSize:"1rem",
+    fontFamily:"inherit", outline:"none", marginBottom:"0.75rem",
+    boxSizing:"border-box"
   };
 
   return (
     <div style={{maxWidth:760,margin:"0 auto",padding:"4rem 1.5rem 2rem",textAlign:"center"}}>
       <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.accent}`,color:C.accentLight,letterSpacing:2,marginBottom:"1rem"}}>开始之前</div>
-      <h2 style={{fontSize:"1.5rem",fontWeight:700,color:C.text,marginBottom:"0.5rem"}}>请输入你的姓名</h2>
-      <p style={{color:C.muted,fontSize:"0.85rem",marginBottom:"2rem"}}>仅用于内测记录，不会对外公开</p>
-      <div style={{maxWidth:360,margin:"0 auto"}}>
+      <h2 style={{fontSize:"1.5rem",fontWeight:700,color:C.text,marginBottom:"0.5rem"}}>请填写基本信息</h2>
+      <p style={{color:C.muted,fontSize:"0.85rem",marginBottom:"2rem"}}>仅用于记录和归档，不会对外公开</p>
+      <div style={{maxWidth:360,margin:"0 auto",textAlign:"left"}}>
+        <div style={{fontSize:"0.8rem",color:C.muted,marginBottom:"0.35rem",letterSpacing:1}}>你的姓名</div>
         <input
           type="text"
           value={name}
           onChange={e=>{setName(e.target.value);setDupWarning(false);}}
-          placeholder="你的姓名或昵称"
-          onKeyDown={e=>e.key==="Enter"&&name.trim()&&handleConfirm(name)}
-          style={{
-            width:"100%", padding:"0.8rem 1rem",
-            background:C.card, border:`1px solid ${dupWarning?C.gold:C.border}`,
-            borderRadius:6, color:C.text, fontSize:"1rem",
-            fontFamily:"inherit", outline:"none", marginBottom:"0.75rem",
-            boxSizing:"border-box"
-          }}
+          placeholder="姓名或昵称"
+          onKeyDown={e=>e.key==="Enter"&&canProceed&&handleConfirm(name,className)}
+          style={{...inputStyle, border:`1px solid ${dupWarning?C.gold:C.border}`}}
         />
-        {/* 重复提交警告 */}
+        <div style={{fontSize:"0.8rem",color:C.muted,marginBottom:"0.35rem",letterSpacing:1}}>你的班级</div>
+        <select
+          value={className}
+          onChange={e=>setClassName(e.target.value)}
+          style={{...inputStyle, appearance:"none", cursor:"pointer",
+            color: className ? C.text : C.muted}}
+        >
+          <option value="" disabled>请选择班级</option>
+          {CLASSES.map(c=><option key={c} value={c}>{c}</option>)}
+        </select>
+
         {dupWarning && (
-          <div style={{background:`${C.gold}18`,border:`1px solid ${C.gold}55`,borderRadius:6,padding:"0.75rem 1rem",marginBottom:"0.75rem",textAlign:"left"}}>
+          <div style={{background:`${C.gold}18`,border:`1px solid ${C.gold}55`,borderRadius:6,padding:"0.75rem 1rem",marginBottom:"0.75rem"}}>
             <div style={{fontSize:"0.85rem",color:C.gold,fontWeight:600,marginBottom:4}}>⚠ 检测到近期已有提交</div>
             <div style={{fontSize:"0.8rem",color:C.textSec,lineHeight:1.7}}>
-              「{name}」在过去5分钟内已提交过一次。<br/>
-              如果是重复点击，无需再次提交。如果确认是新的一次测评，请继续。
+              「{name}」在过去5分钟内已提交过一次。<br/>如果确认是新的一次测评，请继续。
             </div>
             <div style={{display:"flex",gap:8,marginTop:"0.75rem",flexWrap:"wrap"}}>
-              <button onClick={()=>setDupWarning(false)} style={{...btn("outline"),fontSize:"0.8rem",padding:"0.4rem 0.9rem",borderColor:C.border,color:C.muted}}>
-                取消
-              </button>
-              <button onClick={()=>{setDupWarning(false);onConfirm(name.trim());}} style={{...btn("primary"),fontSize:"0.8rem",padding:"0.4rem 0.9rem"}}>
-                确认，这是新的测评 →
-              </button>
+              <button onClick={()=>setDupWarning(false)} style={{...btn("outline"),fontSize:"0.8rem",padding:"0.4rem 0.9rem"}}>取消</button>
+              <button onClick={()=>{setDupWarning(false);onConfirm(name.trim(),className);}} style={{...btn("primary"),fontSize:"0.8rem",padding:"0.4rem 0.9rem"}}>确认，这是新的测评 →</button>
             </div>
           </div>
         )}
         <button
-          onClick={()=>handleConfirm(name)}
-          style={{...btn("primary"),width:"100%",padding:"0.8rem",fontSize:"0.95rem",opacity:name.trim()&&!checking?1:0.5}}
-          disabled={!name.trim()||checking}
+          onClick={()=>handleConfirm(name,className)}
+          style={{...btn("primary"),width:"100%",padding:"0.8rem",fontSize:"0.95rem",opacity:canProceed&&!checking?1:0.4}}
+          disabled={!canProceed||checking}
         >
           {checking ? "检查中…" : "开始测评 →"}
         </button>
@@ -960,7 +973,7 @@ function PotentialMatches({ ranked, excludedMajorIds }) {
   );
 }
 
-function ResultScreen({ answers, excluded, userName, onRestart, onEditExclude }) {
+function ResultScreen({ answers, excluded, userName, className, onRestart, onEditExclude }) {
   const profile = computeUserProfile(answers);
   const ranked = matchMajors(profile);
 
@@ -998,6 +1011,7 @@ function ResultScreen({ answers, excluded, userName, onRestart, onEditExclude })
       },
       body: JSON.stringify({
         user_name: userName,
+        class_name: className,
         answers,
         profile,
         top_matches: topMatchesData,
@@ -1194,6 +1208,7 @@ export default function App() {
   const [answers, setAnswers] = useState({});
   const [excluded, setExcluded] = useState([]);
   const [userName, setUserName] = useState("");
+  const [className, setClassName] = useState("");
   const topRef = useRef(null);
   const scrollTop = () => topRef.current?.scrollIntoView({behavior:"smooth"});
 
@@ -1206,7 +1221,7 @@ export default function App() {
   const handlePrev = () => { if(qIndex>0){setQIndex(i=>i-1);scrollTop();} };
   const handleConfirmExclude = (ex) => { setExcluded(ex); setScreen("result"); scrollTop(); };
   const handleEditExclude = () => { setScreen("exclude"); scrollTop(); };
-  const handleRestart = () => { setScreen("welcome"); setQIndex(0); setAnswers({}); setExcluded([]); setUserName(""); scrollTop(); };
+  const handleRestart = () => { setScreen("welcome"); setQIndex(0); setAnswers({}); setExcluded([]); setUserName(""); setClassName(""); scrollTop(); };
 
   const progress = screen==="quiz" ? ((qIndex+1)/QUESTIONS.length)*100 :
     (screen==="exclude"||screen==="result") ? 100 : 0;
@@ -1228,10 +1243,10 @@ export default function App() {
         </div>
       </div>
       {screen==="welcome"&&<Welcome onStart={()=>setScreen("name")}/>}
-      {screen==="name"&&<NameScreen onConfirm={(n)=>{setUserName(n);setScreen("quiz");scrollTop();}}/>}
+      {screen==="name"&&<NameScreen onConfirm={(n,cls)=>{setUserName(n);setClassName(cls);setScreen("quiz");scrollTop();}}/>}
       {screen==="quiz"&&<QuestionPage qIndex={qIndex} answers={answers} onAnswer={handleAnswer} onNext={handleNext} onPrev={handlePrev}/>}
       {screen==="exclude"&&<ExcludeScreen onConfirm={handleConfirmExclude} initialExcluded={excluded} onBack={excluded.length>0||answers[1]!==undefined ? ()=>{setScreen("result");scrollTop();} : null}/>}
-      {screen==="result"&&<ResultScreen answers={answers} excluded={excluded} userName={userName} onRestart={handleRestart} onEditExclude={handleEditExclude}/>}
+      {screen==="result"&&<ResultScreen answers={answers} excluded={excluded} userName={userName} className={className} onRestart={handleRestart} onEditExclude={handleEditExclude}/>}
     </div>
   );
 }

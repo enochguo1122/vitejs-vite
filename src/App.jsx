@@ -86,7 +86,7 @@ const QUESTIONS = [
     {label:"较好的高中，升学率中等偏上",score:4},
     {label:"普通高中，升学率一般",score:3},
     {label:"职高/中专，或成绩在校内偏弱",score:2},
-    {label:"还没确定/不好评估",score:2}]},
+    {label:"还没确定/不好评估",score:1}]},
   { id:25, dim:"resource", weight:1.0, text:"你有没有可以利用的行业人脉或家庭背景资源？", options:[
     {label:"有，家庭有明显的行业资源",score:5},{label:"有一些，但不稳定",score:3},
     {label:"基本靠自己，没有明显资源",score:2},{label:"完全白手起家",score:1}]},
@@ -112,7 +112,7 @@ const QUESTIONS = [
     {label:"职业是谋生手段，生活才是重心",score:2},{label:"不太想太多，随缘",score:1}]},
   { id:31, dim:"meaning", weight:0.9, text:"你更愿意在哪种场景中工作？", options:[
     {label:"帮助弱势群体或解决社会问题",score:5},{label:"推动技术前沿或科学进步",score:4},
-    {label:"在商业世界里创造价值",score:3},{label:"艺术或文化领域",score:4}]},
+    {label:"在商业世界里创造价值",score:3},{label:"艺术或文化领域",score:2}]},
   { id:32, dim:"patience", weight:1.0, text:"长时间坐在桌前做同一件事（读书、写代码、画图），你的感受是：", options:[
     {label:"完全没问题，我很享受这种专注状态",score:5},
     {label:"可以，习惯了就好",score:4},

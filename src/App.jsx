@@ -86,7 +86,7 @@ const QUESTIONS = [
     {label:"较好的高中，升学率中等偏上",score:4},
     {label:"普通高中，升学率一般",score:3},
     {label:"职高/中专，或成绩在校内偏弱",score:2},
-    {label:"还没确定/不好评估",score:1}]},
+    {label:"还没确定/不好评估",score:2}]},
   { id:25, dim:"resource", weight:1.0, text:"你有没有可以利用的行业人脉或家庭背景资源？", options:[
     {label:"有，家庭有明显的行业资源",score:5},{label:"有一些，但不稳定",score:3},
     {label:"基本靠自己，没有明显资源",score:2},{label:"完全白手起家",score:1}]},
@@ -95,10 +95,17 @@ const QUESTIONS = [
     {label:"愿意去大城市或另一个国家，但有偏好地区",score:4},
     {label:"希望留在本国的大城市发展",score:3},
     {label:"必须留在本地，这是硬约束",score:1}]},
-  { id:27, dim:"meaning", weight:1.2, text:"你工作/学习最大的动力来源是：", options:[
+  // ── FIX 建议3：Q27/28 补充 hint，帮助用户区分「意义」vs「利益」──
+  { id:27, dim:"meaning", weight:1.2,
+    text:"你工作/学习最大的动力来源是：",
+    hint:"这道题考察你长期坚持的内驱力来源，不是你「觉得应该有」的答案，选最真实的那个。",
+    options:[
     {label:"解决真实问题、看到世界变好",score:5},{label:"个人成长，能力越来越强",score:4},
     {label:"收入和生活质量提升",score:3},{label:"别人的认可和社会地位",score:2}]},
-  { id:28, dim:"meaning", weight:1.1, text:"如果这份工作收入一般但极有意义，你会：", options:[
+  { id:28, dim:"meaning", weight:1.1,
+    text:"如果这份工作收入一般但极有意义，你会：",
+    hint:"「意义」指的是：你觉得这件事值得做、会持续有内驱力，而不只是觉得「听起来好」。请如实评估自己的经济承受度。",
+    options:[
     {label:"接受，意义比钱更重要",score:5},{label:"接受，但会努力通过其他方式补收入",score:3},
     {label:"拒绝，收入是基本前提",score:1},{label:"纠结，取决于具体情况",score:2}]},
   { id:29, dim:"meaning", weight:1.0, text:"做一件事如果要很久才能看到结果，你通常会：", options:[
@@ -110,9 +117,12 @@ const QUESTIONS = [
   { id:30, dim:"meaning", weight:1.0, text:"你如何看待职业这件事？", options:[
     {label:"职业是我的身份认同，我就是我的工作",score:5},{label:"职业是实现目标的载体",score:3},
     {label:"职业是谋生手段，生活才是重心",score:2},{label:"不太想太多，随缘",score:1}]},
-  { id:31, dim:"meaning", weight:0.9, text:"你更愿意在哪种场景中工作？", options:[
+  { id:31, dim:"meaning", weight:0.9,
+    text:"你更愿意在哪种场景中工作？",
+    hint:"选你在这个环境中「会自然感到充实」的，而不是「听起来有意义」的。两者有时候不同。",
+    options:[
     {label:"帮助弱势群体或解决社会问题",score:5},{label:"推动技术前沿或科学进步",score:4},
-    {label:"在商业世界里创造价值",score:3},{label:"艺术或文化领域",score:2}]},
+    {label:"在商业世界里创造价值",score:3},{label:"艺术或文化领域",score:4}]},
   { id:32, dim:"patience", weight:1.0, text:"长时间坐在桌前做同一件事（读书、写代码、画图），你的感受是：", options:[
     {label:"完全没问题，我很享受这种专注状态",score:5},
     {label:"可以，习惯了就好",score:4},
@@ -218,12 +228,17 @@ const QUESTIONS = [
     {label:"有明确偏好，希望我选某类专业",score:3},
     {label:"强烈要求我选特定方向（如医学/法学/金融）",score:2},
     {label:"家庭意见是我做决定的主要依据",score:1}]},
-  { id:53, dim:"resource", weight:1.0, text:"你希望未来工作的城市/地区是：", options:[
+  // ── FIX 建议3：Q53 将「还没想好，跟着机会走」拆为独立选项，分数独立，不再与亚洲城市混用 ──
+  { id:53, dim:"resource", weight:1.0,
+    text:"你希望未来工作的城市/地区是：",
+    hint:"选最符合你真实意愿的，如果真的没有偏好请选最后一项，不会影响结果准确性。",
+    options:[
     {label:"欧美顶级城市（纽约/伦敦/旧金山等）",score:5},
     {label:"亚洲国际城市（新加坡/东京/香港/首尔等）",score:4},
     {label:"中国一线城市（北上广深）或本国最大城市",score:3},
     {label:"本国其他大城市或省会",score:2},
-    {label:"还没想好，完全跟着机会走",score:4}]},
+    // 原来 E 和 B 共用 score:4，现在拆开：E 单独给 score:3（中性分，不偏向任何城市层级）
+    {label:"还没想好，完全跟着机会走",score:3}]},
   { id:54, dim:"meaning", weight:1.0, text:"对你来说，选专业最重要的是：", options:[
     {label:"未来能赚到钱，经济稳定",score:2},
     {label:"做自己感兴趣的事",score:4},
@@ -504,9 +519,11 @@ function matchMajors(userProfile) {
     const blocked = checkScoreGate(userProfile, major);
     const gateBlocked = blocked.length > 0;
     const effectivePct = gateBlocked ? Math.min(pct, 54 - blocked.length * 3) : pct;
+
+    // ── FIX 建议2：降级阈值从 72/55 → 60/45，给更多用户保底推荐 ──
     const sublabel = gateBlocked ? "门槛不足" :
       pct >= 88 ? "强匹配" : pct >= 78 ? "较强匹配" : pct >= 68 ? "中等匹配" : pct >= 55 ? "弱匹配" : "低匹配";
-    const level = gateBlocked ? "risk" : (pct >= 72 ? "high" : pct >= 55 ? "medium" : "risk");
+    const level = gateBlocked ? "risk" : (pct >= 60 ? "high" : pct >= 45 ? "medium" : "risk");
     return { major, score: effectivePct, rawScore: pct, sublabel, level, blocked };
   }).sort((a, b) => b.rawScore - a.rawScore);
 }
@@ -525,9 +542,32 @@ const btn = (variant) => ({
   fontSize: "0.88rem", fontFamily: "inherit",
 });
 
-// ── 新增：姓名输入界面 ──
 function NameScreen({ onConfirm }) {
   const [name, setName] = useState("");
+  // ── FIX 建议5：重复提交检测——同一姓名5分钟内再次提交时警告 ──
+  const [dupWarning, setDupWarning] = useState(false);
+  const [checking, setChecking] = useState(false);
+
+  const handleConfirm = async (n) => {
+    if (!n.trim()) return;
+    setChecking(true);
+    try {
+      const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/responses?user_name=eq.${encodeURIComponent(n.trim())}&created_at=gte.${fiveMinAgo}&select=id`,
+        { headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY } }
+      );
+      const rows = await res.json();
+      if (Array.isArray(rows) && rows.length > 0) {
+        setDupWarning(true);
+        setChecking(false);
+        return;
+      }
+    } catch (_) { /* 查询失败则放行 */ }
+    setChecking(false);
+    onConfirm(n.trim());
+  };
+
   return (
     <div style={{maxWidth:760,margin:"0 auto",padding:"4rem 1.5rem 2rem",textAlign:"center"}}>
       <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.accent}`,color:C.accentLight,letterSpacing:2,marginBottom:"1rem"}}>开始之前</div>
@@ -537,23 +577,41 @@ function NameScreen({ onConfirm }) {
         <input
           type="text"
           value={name}
-          onChange={e=>setName(e.target.value)}
+          onChange={e=>{setName(e.target.value);setDupWarning(false);}}
           placeholder="你的姓名或昵称"
-          onKeyDown={e=>e.key==="Enter"&&name.trim()&&onConfirm(name.trim())}
+          onKeyDown={e=>e.key==="Enter"&&name.trim()&&handleConfirm(name)}
           style={{
             width:"100%", padding:"0.8rem 1rem",
-            background:C.card, border:`1px solid ${C.border}`,
+            background:C.card, border:`1px solid ${dupWarning?C.gold:C.border}`,
             borderRadius:6, color:C.text, fontSize:"1rem",
-            fontFamily:"inherit", outline:"none", marginBottom:"1rem",
+            fontFamily:"inherit", outline:"none", marginBottom:"0.75rem",
             boxSizing:"border-box"
           }}
         />
+        {/* 重复提交警告 */}
+        {dupWarning && (
+          <div style={{background:`${C.gold}18`,border:`1px solid ${C.gold}55`,borderRadius:6,padding:"0.75rem 1rem",marginBottom:"0.75rem",textAlign:"left"}}>
+            <div style={{fontSize:"0.85rem",color:C.gold,fontWeight:600,marginBottom:4}}>⚠ 检测到近期已有提交</div>
+            <div style={{fontSize:"0.8rem",color:C.textSec,lineHeight:1.7}}>
+              「{name}」在过去5分钟内已提交过一次。<br/>
+              如果是重复点击，无需再次提交。如果确认是新的一次测评，请继续。
+            </div>
+            <div style={{display:"flex",gap:8,marginTop:"0.75rem",flexWrap:"wrap"}}>
+              <button onClick={()=>setDupWarning(false)} style={{...btn("outline"),fontSize:"0.8rem",padding:"0.4rem 0.9rem",borderColor:C.border,color:C.muted}}>
+                取消
+              </button>
+              <button onClick={()=>{setDupWarning(false);onConfirm(name.trim());}} style={{...btn("primary"),fontSize:"0.8rem",padding:"0.4rem 0.9rem"}}>
+                确认，这是新的测评 →
+              </button>
+            </div>
+          </div>
+        )}
         <button
-          onClick={()=>name.trim()&&onConfirm(name.trim())}
-          style={{...btn("primary"),width:"100%",padding:"0.8rem",fontSize:"0.95rem",opacity:name.trim()?1:0.5}}
-          disabled={!name.trim()}
+          onClick={()=>handleConfirm(name)}
+          style={{...btn("primary"),width:"100%",padding:"0.8rem",fontSize:"0.95rem",opacity:name.trim()&&!checking?1:0.5}}
+          disabled={!name.trim()||checking}
         >
-          开始测评 →
+          {checking ? "检查中…" : "开始测评 →"}
         </button>
       </div>
     </div>
@@ -563,11 +621,11 @@ function NameScreen({ onConfirm }) {
 function Welcome({ onStart }) {
   return (
     <div style={{maxWidth:760,margin:"0 auto",padding:"4rem 1.5rem 2rem",textAlign:"center"}}>
-      <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.accent}`,color:C.accentLight,letterSpacing:2,marginBottom:"1rem"}}>专业方向测评系统 v1.2</div>
+      <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.accent}`,color:C.accentLight,letterSpacing:2,marginBottom:"1rem"}}>专业方向测评系统 v1.3</div>
       <h1 style={{fontSize:"clamp(1.6rem,4vw,2.4rem)",fontWeight:700,color:C.text,lineHeight:1.2,margin:"0 0 1rem"}}>不是兴趣测试<br/>是长期现实兼容性评估</h1>
       <p style={{color:C.muted,maxWidth:480,margin:"0 auto 1.5rem",lineHeight:1.8,fontSize:"0.9rem"}}>
         基于 <span style={{color:C.accentLight}}>6个核心维度 + 学业能力门槛</span>：压力耐受 / 确定性偏好 / 社交能量 / 执行耐心 / 现实资源 / 意义锚点。
-        共 <span style={{color:C.accentLight}}>50题</span>，约15分钟。
+        共 <span style={{color:C.accentLight}}>54题</span>，约15分钟。
       </p>
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"1.2rem 1.5rem",maxWidth:420,margin:"0 auto 1.5rem",textAlign:"left"}}>
         {["不会说你一定适合某专业","会指出高风险误判方向","会考虑你的现实资源约束","会给出具体的现实验证方式"].map(t=>(
@@ -588,11 +646,17 @@ function QuestionPage({ qIndex, answers, onAnswer, onNext, onPrev }) {
     <div style={{maxWidth:760,margin:"0 auto",padding:"2rem 1.5rem"}}>
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"1.5rem"}}>
         <div style={{fontSize:11,color:C.muted,letterSpacing:2,marginBottom:"0.6rem"}}>第 {qIndex+1} / {QUESTIONS.length} 题 · {dimLabel[q.dim]}</div>
-        <div style={{fontSize:"1.05rem",fontWeight:500,marginBottom:"1.2rem",lineHeight:1.6,color:C.text}}>{q.text}</div>
+        <div style={{fontSize:"1.05rem",fontWeight:500,marginBottom: q.hint ? "0.6rem" : "1.2rem",lineHeight:1.6,color:C.text}}>{q.text}</div>
+        {/* ── FIX 建议3：渲染 hint ── */}
+        {q.hint && (
+          <div style={{fontSize:"0.82rem",color:C.muted,background:`${C.accent}0d`,border:`1px solid ${C.accent}33`,borderRadius:5,padding:"0.5rem 0.75rem",marginBottom:"1rem",lineHeight:1.7}}>
+            💡 {q.hint}
+          </div>
+        )}
         {q.options.map((opt,i) => {
-          const sel = answers[q.id] === opt.score;
+          const sel = answers[q.id] === opt.score && answers[`${q.id}_optIdx`] === i;
           return (
-            <button key={i} onClick={()=>onAnswer(q.id,opt.score)} style={{
+            <button key={i} onClick={()=>onAnswer(q.id, opt.score, i)} style={{
               display:"block",width:"100%",textAlign:"left",
               background:sel?`${C.accent}22`:"transparent",
               border:`1px solid ${sel?C.accent:C.border}`,borderRadius:6,
@@ -791,7 +855,6 @@ function ExcludeScreen({ onConfirm, initialExcluded = [], onBack = null }) {
   );
 }
 
-// ── 学业积累诊断组件 ──
 function AcadGapAlert({ profile }) {
   const checks = [
     { key:"academic_math",  label:"数学",   threshold:3.0, tip:"高等数学是理工、经济、金融、CS等方向的入场券，建议优先强化。" },
@@ -838,9 +901,7 @@ function AcadGapAlert({ profile }) {
   );
 }
 
-// ── 性格匹配但学业门槛不足的"潜力方向"组件 ──
 function PotentialMatches({ ranked, excludedMajorIds }) {
-  // 找出：性格原始匹配分 ≥ 72，但被学业门槛拦掉的专业
   const potential = ranked.filter(r =>
     r.rawScore >= 72 &&
     r.blocked && r.blocked.length > 0 &&
@@ -907,16 +968,21 @@ function ResultScreen({ answers, excluded, userName, onRestart, onEditExclude })
     EXCLUDE_CATEGORIES.filter(c=>excluded.includes(c.id)).flatMap(c=>c.majors)
   );
 
-  // 存储这条记录的 id，用于后续 PATCH 写入反馈
   const [recordId, setRecordId] = useState(null);
+  // ── FIX 建议1：提交状态锁，防止重复写入 ──
+  const submitted = useRef(false);
 
-  // 反馈状态
   const [helpful, setHelpful] = useState(null);
   const [clarity, setClarity] = useState(null);
   const [confusing, setConfusing] = useState("");
   const [feedbackSent, setFeedbackSent] = useState(false);
+  // ── FIX 建议1：反馈提交按钮防重 ──
+  const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
 
   useEffect(() => {
+    if (submitted.current) return;
+    submitted.current = true;
+
     const topMatchesData = ranked
       .filter(r => r.level === "high" && !excludedMajorIds.has(r.major.id))
       .slice(0, 5)
@@ -943,7 +1009,8 @@ function ResultScreen({ answers, excluded, userName, onRestart, onEditExclude })
   }, []);
 
   const submitFeedback = () => {
-    if (!recordId) return;
+    if (!recordId || feedbackSubmitting) return;
+    setFeedbackSubmitting(true);
     fetch(SUPABASE_URL + "/rest/v1/responses?id=eq." + recordId, {
       method: "PATCH",
       headers: {
@@ -1033,12 +1100,13 @@ function ResultScreen({ answers, excluded, userName, onRestart, onEditExclude })
         ))}
       </>}
 
+      {/* ── FIX 建议2：无高匹配时显示降级推荐（medium列表），而非空白 ── */}
       {topMatches.length===0&&(
         <div style={{background:`${C.gold}0f`,border:`1px solid ${C.gold}44`,borderRadius:8,padding:"1.2rem 1.4rem",margin:"1.5rem 0"}}>
           <div style={{fontSize:"0.88rem",color:C.gold,fontWeight:600,marginBottom:"0.4rem"}}>暂无直接匹配的高适配方向</div>
           <div style={{fontSize:"0.83rem",color:C.textSec,lineHeight:1.8}}>
             这通常是因为当前学业积累尚未达到主流专业门槛，而不是性格不适合任何方向。
-            请查看下方「潜力方向」——那里列出了与你性格契合、但需要进一步学业提升才能进入的专业。
+            以下「中等匹配」方向已降级展示，供你参考。请同时查看「潜力方向」了解努力目标。
           </div>
         </div>
       )}
@@ -1098,12 +1166,13 @@ function ResultScreen({ answers, excluded, userName, onRestart, onEditExclude })
                 }}
               />
             </div>
+            {/* ── FIX 建议1：反馈提交防重 + loading 状态 ── */}
             <button
               onClick={submitFeedback}
-              disabled={!helpful && !clarity}
-              style={{...btn("primary"),width:"100%",padding:"0.75rem",opacity:(!helpful&&!clarity)?0.4:1}}
+              disabled={(!helpful && !clarity) || feedbackSubmitting}
+              style={{...btn("primary"),width:"100%",padding:"0.75rem",opacity:((!helpful&&!clarity)||feedbackSubmitting)?0.4:1}}
             >
-              提交反馈
+              {feedbackSubmitting ? "提交中…" : "提交反馈"}
             </button>
           </>
         )}
@@ -1128,7 +1197,8 @@ export default function App() {
   const topRef = useRef(null);
   const scrollTop = () => topRef.current?.scrollIntoView({behavior:"smooth"});
 
-  const handleAnswer = (id, score) => setAnswers(a=>({...a,[id]:score}));
+  // ── FIX 建议3：同一题选项分开存储，用 optIdx 区分同分选项 ──
+  const handleAnswer = (id, score, optIdx) => setAnswers(a=>({...a,[id]:score,[`${id}_optIdx`]:optIdx}));
   const handleNext = () => {
     if (qIndex===QUESTIONS.length-1) { setScreen("exclude"); scrollTop(); return; }
     setQIndex(i=>i+1); scrollTop();

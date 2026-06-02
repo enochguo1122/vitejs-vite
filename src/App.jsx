@@ -780,79 +780,22 @@ function ExcludeScreen({ onConfirm }) {
   );
 }
 
-// ── 新增：测评结束反馈问卷 ──
-function FeedbackScreen({ onSubmit }) {
-  const [helpful, setHelpful] = useState(null);
-  const [clarity, setClarity] = useState(null);
-  const [confusing, setConfusing] = useState("");
-
-  const ratingBtns = (val, setVal, color) => [1,2,3,4,5].map(n => (
-    <button key={n} onClick={()=>setVal(n)} style={{
-      width:40, height:40, borderRadius:6, cursor:"pointer", fontFamily:"inherit",
-      fontSize:"0.9rem", fontWeight:600,
-      background: val===n ? color : "transparent",
-      border: `1px solid ${val===n ? color : C.border}`,
-      color: val===n ? "#fff" : C.textSec,
-    }}>{n}</button>
-  ));
-
-  return (
-    <div style={{maxWidth:760,margin:"0 auto",padding:"2rem 1.5rem"}}>
-      <div style={{marginBottom:"1.5rem"}}>
-        <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.gold}`,color:C.gold,letterSpacing:2,marginBottom:"0.8rem"}}>内测反馈</div>
-        <h2 style={{fontSize:"1.3rem",fontWeight:700,color:C.text,margin:"0 0 0.5rem"}}>2分钟帮我们改进</h2>
-        <p style={{color:C.muted,fontSize:"0.85rem",margin:0}}>你的反馈直接影响这套测评的下一版本</p>
-      </div>
-
-      <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"1.5rem",marginBottom:"1rem"}}>
-        <div style={{fontSize:"0.9rem",color:C.text,marginBottom:"1rem",fontWeight:500}}>这个测评对你有帮助吗？</div>
-        <div style={{display:"flex",gap:8,marginBottom:4}}>{ratingBtns(helpful,setHelpful,C.success)}</div>
-        <div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:C.muted,marginTop:4}}>
-          <span>完全没帮助</span><span>非常有帮助</span>
-        </div>
-      </div>
-
-      <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"1.5rem",marginBottom:"1rem"}}>
-        <div style={{fontSize:"0.9rem",color:C.text,marginBottom:"1rem",fontWeight:500}}>题目容易理解吗？</div>
-        <div style={{display:"flex",gap:8,marginBottom:4}}>{ratingBtns(clarity,setClarity,C.accent)}</div>
-        <div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:C.muted,marginTop:4}}>
-          <span>很难理解</span><span>非常清晰</span>
-        </div>
-      </div>
-
-      <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"1.5rem",marginBottom:"1.5rem"}}>
-        <div style={{fontSize:"0.9rem",color:C.text,marginBottom:"0.8rem",fontWeight:500}}>哪道题让你最困惑？（选填）</div>
-        <textarea
-          value={confusing}
-          onChange={e=>setConfusing(e.target.value)}
-          placeholder="题目编号或描述，比如'第23题选项不够贴近我的情况'"
-          style={{
-            width:"100%", minHeight:80, padding:"0.7rem",
-            background:"transparent", border:`1px solid ${C.border}`,
-            borderRadius:6, color:C.text, fontSize:"0.85rem",
-            fontFamily:"inherit", resize:"vertical", outline:"none",
-            boxSizing:"border-box"
-          }}
-        />
-      </div>
-
-      <button
-        onClick={()=>onSubmit({helpful,clarity,confusing})}
-        style={{...btn("primary"),width:"100%",padding:"0.8rem",fontSize:"0.95rem"}}
-      >
-        提交反馈，查看我的报告 →
-      </button>
-    </div>
-  );
-}
-
-function ResultScreen({ answers, excluded, userName, feedback, onRestart }) {
+function ResultScreen({ answers, excluded, userName, onRestart }) {
   const profile = computeUserProfile(answers);
   const ranked = matchMajors(profile);
 
   const excludedMajorIds = new Set(
     EXCLUDE_CATEGORIES.filter(c=>excluded.includes(c.id)).flatMap(c=>c.majors)
   );
+
+  // 存储这条记录的 id，用于后续 PATCH 写入反馈
+  const [recordId, setRecordId] = useState(null);
+
+  // 反馈状态
+  const [helpful, setHelpful] = useState(null);
+  const [clarity, setClarity] = useState(null);
+  const [confusing, setConfusing] = useState("");
+  const [feedbackSent, setFeedbackSent] = useState(false);
 
   useEffect(() => {
     const topMatchesData = ranked
@@ -866,7 +809,7 @@ function ResultScreen({ answers, excluded, userName, feedback, onRestart }) {
         "Content-Type": "application/json",
         "apikey": SUPABASE_KEY,
         "Authorization": "Bearer " + SUPABASE_KEY,
-        "Prefer": "return=minimal"
+        "Prefer": "return=representation"
       },
       body: JSON.stringify({
         user_name: userName,
@@ -874,10 +817,35 @@ function ResultScreen({ answers, excluded, userName, feedback, onRestart }) {
         profile,
         top_matches: topMatchesData,
         excluded,
-        feedback
       })
-    });
+    }).then(r => r.json()).then(data => {
+      if (data && data[0] && data[0].id) setRecordId(data[0].id);
+    }).catch(()=>{});
   }, []);
+
+  const submitFeedback = () => {
+    if (!recordId) return;
+    fetch(SUPABASE_URL + "/rest/v1/responses?id=eq." + recordId, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY,
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({ feedback: { helpful, clarity, confusing } })
+    }).then(() => setFeedbackSent(true)).catch(()=>setFeedbackSent(true));
+  };
+
+  const ratingBtns = (val, setVal, color) => [1,2,3,4,5].map(n => (
+    <button key={n} onClick={()=>setVal(n)} style={{
+      width:38, height:38, borderRadius:6, cursor:"pointer", fontFamily:"inherit",
+      fontSize:"0.9rem", fontWeight:600,
+      background: val===n ? color : "transparent",
+      border: `1px solid ${val===n ? color : C.border}`,
+      color: val===n ? "#fff" : C.textSec,
+    }}>{n}</button>
+  ));
 
   const topMatches = ranked.filter(r=>r.level==="high" && !excludedMajorIds.has(r.major.id));
   const midMatches = ranked.filter(r=>r.level==="medium" && !excludedMajorIds.has(r.major.id));
@@ -954,7 +922,53 @@ function ResultScreen({ answers, excluded, userName, feedback, onRestart }) {
         {displayRisks.map(r=><MajorCard key={r.major.id} result={{...r,level:"risk",sublabel:"高风险"}}/>)}
       </>}
 
-      <div style={{marginTop:"2rem",padding:"1rem",background:C.card,border:`1px solid ${C.border}`,borderRadius:8,fontSize:"0.82rem",color:C.muted,lineHeight:1.8}}>
+      <div style={{marginTop:"2rem",background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"1.5rem"}}>
+        <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.gold}`,color:C.gold,letterSpacing:2,marginBottom:"1rem"}}>内测反馈</div>
+        {feedbackSent ? (
+          <div style={{textAlign:"center",padding:"1rem 0",color:C.success,fontSize:"0.9rem"}}>✓ 感谢你的反馈！</div>
+        ) : (
+          <>
+            <div style={{marginBottom:"1rem"}}>
+              <div style={{fontSize:"0.88rem",color:C.text,marginBottom:"0.6rem",fontWeight:500}}>这个测评对你有帮助吗？</div>
+              <div style={{display:"flex",gap:8,marginBottom:4}}>{ratingBtns(helpful,setHelpful,C.success)}</div>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:C.muted,marginTop:4}}>
+                <span>完全没帮助</span><span>非常有帮助</span>
+              </div>
+            </div>
+            <div style={{marginBottom:"1rem"}}>
+              <div style={{fontSize:"0.88rem",color:C.text,marginBottom:"0.6rem",fontWeight:500}}>题目容易理解吗？</div>
+              <div style={{display:"flex",gap:8,marginBottom:4}}>{ratingBtns(clarity,setClarity,C.accent)}</div>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:C.muted,marginTop:4}}>
+                <span>很难理解</span><span>非常清晰</span>
+              </div>
+            </div>
+            <div style={{marginBottom:"1rem"}}>
+              <div style={{fontSize:"0.88rem",color:C.text,marginBottom:"0.6rem",fontWeight:500}}>哪道题让你最困惑？（选填）</div>
+              <textarea
+                value={confusing}
+                onChange={e=>setConfusing(e.target.value)}
+                placeholder="题目编号或描述，比如'第23题选项不够贴近我的情况'"
+                style={{
+                  width:"100%", minHeight:70, padding:"0.7rem",
+                  background:"transparent", border:`1px solid ${C.border}`,
+                  borderRadius:6, color:C.text, fontSize:"0.85rem",
+                  fontFamily:"inherit", resize:"vertical", outline:"none",
+                  boxSizing:"border-box"
+                }}
+              />
+            </div>
+            <button
+              onClick={submitFeedback}
+              disabled={!helpful && !clarity}
+              style={{...btn("primary"),width:"100%",padding:"0.75rem",opacity:(!helpful&&!clarity)?0.4:1}}
+            >
+              提交反馈
+            </button>
+          </>
+        )}
+      </div>
+
+      <div style={{marginTop:"1rem",padding:"1rem",background:C.card,border:`1px solid ${C.border}`,borderRadius:8,fontSize:"0.82rem",color:C.muted,lineHeight:1.8}}>
         ⚠ 免责声明：本测试结果仅供参考，不构成专业建议。建议结合真实实习体验、职业咨询和与从业者的对话综合判断。
       </div>
       <div style={{textAlign:"center",marginTop:"1.5rem"}}>
@@ -970,7 +984,6 @@ export default function App() {
   const [answers, setAnswers] = useState({});
   const [excluded, setExcluded] = useState([]);
   const [userName, setUserName] = useState("");
-  const [feedback, setFeedback] = useState(null);
   const topRef = useRef(null);
   const scrollTop = () => topRef.current?.scrollIntoView({behavior:"smooth"});
 
@@ -980,12 +993,11 @@ export default function App() {
     setQIndex(i=>i+1); scrollTop();
   };
   const handlePrev = () => { if(qIndex>0){setQIndex(i=>i-1);scrollTop();} };
-  const handleConfirmExclude = (ex) => { setExcluded(ex); setScreen("feedback"); scrollTop(); };
-  const handleFeedback = (fb) => { setFeedback(fb); setScreen("result"); scrollTop(); };
-  const handleRestart = () => { setScreen("welcome"); setQIndex(0); setAnswers({}); setExcluded([]); setUserName(""); setFeedback(null); scrollTop(); };
+  const handleConfirmExclude = (ex) => { setExcluded(ex); setScreen("result"); scrollTop(); };
+  const handleRestart = () => { setScreen("welcome"); setQIndex(0); setAnswers({}); setExcluded([]); setUserName(""); scrollTop(); };
 
   const progress = screen==="quiz" ? ((qIndex+1)/QUESTIONS.length)*100 :
-    (screen==="exclude"||screen==="feedback"||screen==="result") ? 100 : 0;
+    (screen==="exclude"||screen==="result") ? 100 : 0;
 
   return (
     <div ref={topRef} style={{fontFamily:"'IBM Plex Mono','Courier New',monospace",background:C.bg,color:C.text,minHeight:"100vh"}}>
@@ -1007,8 +1019,7 @@ export default function App() {
       {screen==="name"&&<NameScreen onConfirm={(n)=>{setUserName(n);setScreen("quiz");scrollTop();}}/>}
       {screen==="quiz"&&<QuestionPage qIndex={qIndex} answers={answers} onAnswer={handleAnswer} onNext={handleNext} onPrev={handlePrev}/>}
       {screen==="exclude"&&<ExcludeScreen onConfirm={handleConfirmExclude}/>}
-      {screen==="feedback"&&<FeedbackScreen onSubmit={handleFeedback}/>}
-      {screen==="result"&&<ResultScreen answers={answers} excluded={excluded} userName={userName} feedback={feedback} onRestart={handleRestart}/>}
+      {screen==="result"&&<ResultScreen answers={answers} excluded={excluded} userName={userName} onRestart={handleRestart}/>}
     </div>
   );
 }

@@ -73,12 +73,14 @@ const QUESTIONS = [
   { id:22, dim:"resource", weight:1.3, text:"你的家庭经济状况（如实回答，这影响现实路径）：", options:[
     {label:"宽裕，可以支持长期求学或出国",score:5},{label:"中等，可以读到本科/硕士，但需兼顾就业",score:3},
     {label:"有压力，毕业后需要尽快经济独立",score:2},{label:"困难，就业优先级高于深造",score:1}]},
-  { id:23, dim:"resource", weight:1.1, text:"你所在城市/地区的产业资源是：", options:[
-    {label:"一线城市，行业资源丰富",score:5},{label:"新一线或省会城市，部分资源",score:3},
-    {label:"三四线城市，资源一般",score:2},{label:"县城或农村地区",score:1}]},
+  { id:23, dim:"resource", weight:1.1, text:"你目前所在地区的教育和就业资源是：", options:[
+    {label:"国际化大城市（纽约/伦敦/新加坡/北上广深等），资源极丰富",score:5},
+    {label:"中型城市或发达地区，有一定资源",score:3},
+    {label:"小城市或资源一般的地区",score:2},
+    {label:"资源匮乏地区，主要依靠网络获取信息",score:1}]},
   { id:24, dim:"resource", weight:1.0, text:"你现在读的或刚毕业的高中，大概是什么层次？", options:[
-    {label:"重点高中/省级示范校，升学率很高",score:5},
-    {label:"普通高中，升学率中等偏上",score:4},
+    {label:"顶级高中（IB/AP/A-Level重点校，或国内省级示范校），升学率很高",score:5},
+    {label:"较好的高中，升学率中等偏上",score:4},
     {label:"普通高中，升学率一般",score:3},
     {label:"职高/中专，或成绩在校内偏弱",score:2},
     {label:"还没确定/不好评估",score:2}]},
@@ -86,8 +88,10 @@ const QUESTIONS = [
     {label:"有，家庭有明显的行业资源",score:5},{label:"有一些，但不稳定",score:3},
     {label:"基本靠自己，没有明显资源",score:2},{label:"完全白手起家",score:1}]},
   { id:26, dim:"resource", weight:0.9, text:"你愿意为了最好的发展机会，离开家乡去外地甚至国外吗？", options:[
-    {label:"完全愿意，机会在哪我去哪",score:5},{label:"愿意去一线城市，但不想出国",score:4},
-    {label:"希望留在省内发展",score:2},{label:"必须留在本地，这是硬约束",score:1}]},
+    {label:"完全愿意，机会在哪我去哪（包括出国）",score:5},
+    {label:"愿意去大城市或另一个国家，但有偏好地区",score:4},
+    {label:"希望留在本国的大城市发展",score:3},
+    {label:"必须留在本地，这是硬约束",score:1}]},
   { id:27, dim:"meaning", weight:1.2, text:"你工作/学习最大的动力来源是：", options:[
     {label:"解决真实问题、看到世界变好",score:5},{label:"个人成长，能力越来越强",score:4},
     {label:"收入和生活质量提升",score:3},{label:"别人的认可和社会地位",score:2}]},
@@ -136,122 +140,90 @@ const QUESTIONS = [
   { id:40, dim:"certainty", weight:1.0, text:"你怎么看待做了5年发现选错了这件事？", options:[
     {label:"会认真评估再转，经历都是资产",score:3},{label:"无法接受，我必须一开始选对",score:5},
     {label:"转就转，我对试错有较高接受度",score:1},{label:"会在选方向时极度谨慎来避免这种情况",score:4}]},
-
-  // === 学业能力门槛（41-50）===
-  { id:41, dim:"academic_math", weight:1.5,
-    text:"你的数学成绩在班级/年级中的水平大致是：",
-    options:[
-      {label:"前10%，数学是我的强项",score:5},
-      {label:"前30%，中上水平",score:4},
-      {label:"中等，不算突出也不差",score:3},
-      {label:"偏弱，经常需要花大力气才能跟上",score:2},
-      {label:"很差，数学是我明显的短板",score:1}]},
-  { id:42, dim:"academic_science", weight:1.4,
-    text:"理科综合（物理+化学+生物）中，你的整体表现是：",
-    options:[
-      {label:"都不错，理科是我的方向",score:5},
-      {label:"物理/化学较好，生物一般",score:4},
-      {label:"生物较好，物理/化学偏弱",score:3},
-      {label:"整体偏弱，理科不是我的强项",score:2},
-      {label:"选的文科，没有学理科",score:1}]},
-  { id:43, dim:"academic_lang", weight:1.3,
-    text:"语文/写作/文字表达方面，你的水平大致是：",
-    options:[
-      {label:"很强，写作是我的强项，表达清晰有力",score:5},
-      {label:"中上，能写出较好的文章",score:4},
-      {label:"中等，能完成任务但不算突出",score:3},
-      {label:"偏弱，文字表达让我有些吃力",score:2},
-      {label:"很差，写作是我的明显短板",score:1}]},
-  { id:44, dim:"academic_eng", weight:1.2,
-    text:"你的英语能力（读/写/听/说综合）大致是：",
-    options:[
-      {label:"很强，能流利读写英文资料",score:5},
-      {label:"中上，基本能看懂英文文献",score:4},
-      {label:"中等，考试勉强，实际应用有限",score:3},
-      {label:"偏弱，英语是我的短板",score:2},
-      {label:"很差，英语极度吃力",score:1}]},
-  { id:45, dim:"academic_avg", weight:1.5,
-    text:"你的总体学业成绩（高考/会考/GPA）在同龄人中的位置大约是：",
-    options:[
-      {label:"前5%，属于顶尖学生",score:5},
-      {label:"前20%，成绩良好",score:4},
-      {label:"前50%，中等偏上",score:3},
-      {label:"后50%，中等偏下",score:2},
-      {label:"后20%，成绩明显偏弱",score:1}]},
-  { id:46, dim:"academic_math", weight:1.2,
-    text:"面对一道需要多步推导的逻辑/数学题，你通常：",
-    options:[
-      {label:"很享受，推导过程让我有成就感",score:5},
-      {label:"可以完成，但需要较长时间",score:4},
-      {label:"能做，但不喜欢这类题",score:3},
-      {label:"经常卡住，需要大量辅助",score:2},
-      {label:"基本放弃，这类题让我绝望",score:1}]},
-  { id:47, dim:"academic_memory", weight:1.2,
-    text:"你的记忆力和知识积累能力大致是：",
-    options:[
-      {label:"很强，背诵和记忆是我的优势",score:5},
-      {label:"中上，记得住大部分重要内容",score:4},
-      {label:"中等，正常水平",score:3},
-      {label:"偏弱，记忆对我来说比较费力",score:2},
-      {label:"很差，死记硬背类的任务让我很痛苦",score:1}]},
-  { id:48, dim:"academic_science", weight:1.1,
-    text:"你的空间感知和动手能力（实验/制作/绘图）大致是：",
-    options:[
-      {label:"很强，我擅长动手和空间想象",score:5},
-      {label:"中上，比一般人好一些",score:4},
-      {label:"中等，普通水平",score:3},
-      {label:"偏弱，动手和空间类任务让我吃力",score:2},
-      {label:"很差，这是我明显的短板",score:1}]},
-  { id:49, dim:"academic_lang", weight:1.1,
-    text:"你在人文社科类科目（历史/政治/地理/文学）的表现是：",
-    options:[
-      {label:"很好，这类科目是我的强项",score:5},
-      {label:"中上，理解和记忆都还行",score:4},
-      {label:"中等，能过但不突出",score:3},
-      {label:"偏弱，记概念和背材料让我很痛苦",score:2},
-      {label:"很差，文科类科目我整体不擅长",score:1}]},
-  { id:50, dim:"academic_avg", weight:1.3,
-    text:"你有没有某一门学科特别突出（远超其他科目）？",
-    options:[
-      {label:"有，数学/物理特别突出",score:5},
-      {label:"有，语文/写作/历史特别突出",score:4},
-      {label:"有，英语特别突出",score:3},
-      {label:"有，艺术/体育/技术类特别突出",score:2},
-      {label:"没有，我各科比较均衡或整体一般",score:1}]},
-
-  // === P2 新增：薪资预期 & 文化背景（51-54）===
-  { id:51, dim:"meaning", weight:1.1,
-    text:"毕业后第一份工作，你能接受的最低月薪大概是多少？（以你所在城市为基准）",
-    options:[
-      {label:"5000元以下也可以，我更看重成长空间",score:1},
-      {label:"5000-8000元，基本够用就行",score:2},
-      {label:"8000-15000元，要能覆盖正常生活",score:3},
-      {label:"15000元以上，收入是我选专业的重要因素",score:5},
-      {label:"我对薪资没有明确预期",score:2}]},
-  { id:52, dim:"resource", weight:1.0,
-    text:"你的家庭对你选专业这件事，态度是：",
-    options:[
-      {label:"完全支持我自己决定",score:5},
-      {label:"有建议但尊重我的想法",score:4},
-      {label:"有明确偏好，希望我选某类专业",score:3},
-      {label:"强烈要求我选特定方向（如医学/法学/考公）",score:2},
-      {label:"家庭意见是我做决定的主要依据",score:1}]},
-  { id:53, dim:"resource", weight:1.0,
-    text:"你希望未来工作的城市/地区是：",
-    options:[
-      {label:"北上广深等一线城市",score:5},
-      {label:"省会或新一线城市",score:4},
-      {label:"家乡所在的城市",score:3},
-      {label:"国外/境外",score:5},
-      {label:"还没想好，哪里机会好去哪里",score:4}]},
-  { id:54, dim:"meaning", weight:1.0,
-    text:"对你来说，选专业最重要的是：",
-    options:[
-      {label:"未来能赚到钱，经济稳定",score:2},
-      {label:"做自己感兴趣的事",score:4},
-      {label:"有社会地位和认可",score:3},
-      {label:"能帮助别人或改变社会",score:5},
-      {label:"工作轻松，生活和工作平衡",score:1}]},
+  { id:41, dim:"academic_math", weight:1.5, text:"你的数学成绩在班级/年级中的水平大致是：", options:[
+    {label:"前10%，数学是我的强项",score:5},
+    {label:"前30%，中上水平",score:4},
+    {label:"中等，不算突出也不差",score:3},
+    {label:"偏弱，经常需要花大力气才能跟上",score:2},
+    {label:"很差，数学是我明显的短板",score:1}]},
+  { id:42, dim:"academic_science", weight:1.4, text:"理科综合（物理+化学+生物，或IB/AP理科课程）中，你的整体表现是：", options:[
+    {label:"都不错，理科是我的方向",score:5},
+    {label:"物理/化学较好，生物一般",score:4},
+    {label:"生物较好，物理/化学偏弱",score:3},
+    {label:"整体偏弱，理科不是我的强项",score:2},
+    {label:"选的文科/人文方向，没有深入学理科",score:1}]},
+  { id:43, dim:"academic_lang", weight:1.3, text:"语文/写作/文字表达方面（包括你的母语写作能力），你的水平大致是：", options:[
+    {label:"很强，写作是我的强项，表达清晰有力",score:5},
+    {label:"中上，能写出较好的文章",score:4},
+    {label:"中等，能完成任务但不算突出",score:3},
+    {label:"偏弱，文字表达让我有些吃力",score:2},
+    {label:"很差，写作是我的明显短板",score:1}]},
+  { id:44, dim:"academic_eng", weight:1.2, text:"你的英语能力（读/写/听/说综合）大致是：", options:[
+    {label:"母语级别或接近母语，流利无障碍",score:5},
+    {label:"很强，能流利读写英文学术资料",score:5},
+    {label:"中上，基本能看懂英文文献和课程",score:4},
+    {label:"中等，日常交流可以，学术英语有挑战",score:3},
+    {label:"偏弱，英语是我的短板",score:2}]},
+  { id:45, dim:"academic_avg", weight:1.5, text:"你的总体学业成绩（GPA/高考/IB分数等）在同龄人中的位置大约是：", options:[
+    {label:"前5%，属于顶尖学生",score:5},
+    {label:"前20%，成绩良好",score:4},
+    {label:"前50%，中等偏上",score:3},
+    {label:"后50%，中等偏下",score:2},
+    {label:"后20%，成绩明显偏弱",score:1}]},
+  { id:46, dim:"academic_math", weight:1.2, text:"面对一道需要多步推导的逻辑/数学题，你通常：", options:[
+    {label:"很享受，推导过程让我有成就感",score:5},
+    {label:"可以完成，但需要较长时间",score:4},
+    {label:"能做，但不喜欢这类题",score:3},
+    {label:"经常卡住，需要大量辅助",score:2},
+    {label:"基本放弃，这类题让我绝望",score:1}]},
+  { id:47, dim:"academic_memory", weight:1.2, text:"你的记忆力和知识积累能力大致是：", options:[
+    {label:"很强，背诵和记忆是我的优势",score:5},
+    {label:"中上，记得住大部分重要内容",score:4},
+    {label:"中等，正常水平",score:3},
+    {label:"偏弱，记忆对我来说比较费力",score:2},
+    {label:"很差，死记硬背类的任务让我很痛苦",score:1}]},
+  { id:48, dim:"academic_science", weight:1.1, text:"你的空间感知和动手能力（实验/制作/绘图）大致是：", options:[
+    {label:"很强，我擅长动手和空间想象",score:5},
+    {label:"中上，比一般人好一些",score:4},
+    {label:"中等，普通水平",score:3},
+    {label:"偏弱，动手和空间类任务让我吃力",score:2},
+    {label:"很差，这是我明显的短板",score:1}]},
+  { id:49, dim:"academic_lang", weight:1.1, text:"你在人文社科类科目（历史/政治/地理/文学，或IB/AP相关课程）的表现是：", options:[
+    {label:"很好，这类科目是我的强项",score:5},
+    {label:"中上，理解和记忆都还行",score:4},
+    {label:"中等，能过但不突出",score:3},
+    {label:"偏弱，记概念和背材料让我很痛苦",score:2},
+    {label:"很差，文科类科目我整体不擅长",score:1}]},
+  { id:50, dim:"academic_avg", weight:1.3, text:"你有没有某一门学科特别突出（远超其他科目）？", options:[
+    {label:"有，数学/物理/CS特别突出",score:5},
+    {label:"有，语文/写作/历史/人文特别突出",score:4},
+    {label:"有，英语或其他外语特别突出",score:3},
+    {label:"有，艺术/体育/设计类特别突出",score:2},
+    {label:"没有，我各科比较均衡或整体一般",score:1}]},
+  { id:51, dim:"meaning", weight:1.1, text:"毕业后第一份工作，你能接受的薪资预期是：", options:[
+    {label:"当地生活成本以下也可以，我更看重成长空间",score:1},
+    {label:"刚好覆盖当地基本生活成本",score:2},
+    {label:"当地中等收入水平（能过得不错）",score:3},
+    {label:"当地较高收入水平，收入是我选专业的重要因素",score:5},
+    {label:"我对薪资没有明确预期",score:2}]},
+  { id:52, dim:"resource", weight:1.0, text:"你的家庭对你选专业这件事，态度是：", options:[
+    {label:"完全支持我自己决定",score:5},
+    {label:"有建议但尊重我的想法",score:4},
+    {label:"有明确偏好，希望我选某类专业",score:3},
+    {label:"强烈要求我选特定方向（如医学/法学/金融）",score:2},
+    {label:"家庭意见是我做决定的主要依据",score:1}]},
+  { id:53, dim:"resource", weight:1.0, text:"你希望未来工作的城市/地区是：", options:[
+    {label:"欧美顶级城市（纽约/伦敦/旧金山等）",score:5},
+    {label:"亚洲国际城市（新加坡/东京/香港/首尔等）",score:5},
+    {label:"中国一线城市（北上广深）",score:4},
+    {label:"本国其他大城市或省会",score:3},
+    {label:"还没想好，哪里机会好去哪里",score:4}]},
+  { id:54, dim:"meaning", weight:1.0, text:"对你来说，选专业最重要的是：", options:[
+    {label:"未来能赚到钱，经济稳定",score:2},
+    {label:"做自己感兴趣的事",score:4},
+    {label:"有社会地位和认可",score:3},
+    {label:"能帮助别人或改变社会",score:5},
+    {label:"工作轻松，生活和工作平衡",score:1}]},
 ];
 
 const MAJORS = [
@@ -260,7 +232,7 @@ const MAJORS = [
    profile:{stress:4,certainty:3,social:2,patience:4,resource:3,meaning:3},
    dailyLife:"80%时间写代码、调Bug、看文档；大量独立作业；偶尔开会",
    riskTags:["以为可以靠兴趣撑过去，实际需要极强的逻辑耐受","算法竞争极激烈"],
-   regrets:["三四年后才发现不喜欢坐着敲代码","行业内卷导致精神消耗超预期","技术债让人绝望"],
+   regrets:["三四年后才发现不喜欢坐着敲代码","行业内卷导致精神消耗超预期"],
    validation:["去LeetCode刷3道中等题，看自己会不会享受这个过程","在GitHub找一个开源项目哪怕读3小时代码"]},
   {id:"software_eng",name:"软件工程",category:"理工",
    scoreRequire:{math:4,science:3,lang:2,eng:3,avg:3,memory:3,spatial:3},
@@ -281,7 +253,7 @@ const MAJORS = [
    profile:{stress:5,certainty:4,social:4,patience:5,resource:4,meaning:5},
    dailyLife:"长达8-10年训练期；高强度值班；情绪劳动极重；终身学习",
    riskTags:["入学时热血，5年后精疲力竭是常态","医患关系压力长期存在"],
-   regrets:["没想到规培那么苦","职业早期收入与付出严重不匹配","无法快速经济独立"],
+   regrets:["没想到规培那么苦","职业早期收入与付出严重不匹配"],
    validation:["在医院实习或见习至少一周，体验真实节奏","和住院医聊聊他们的真实状态"]},
   {id:"pharmacy",name:"药学",category:"医学",
    scoreRequire:{math:3,science:4,lang:2,eng:3,avg:3,memory:4,spatial:3},
@@ -301,9 +273,9 @@ const MAJORS = [
    scoreRequire:{math:2,science:1,lang:4,eng:3,avg:3,memory:4,spatial:1},
    profile:{stress:5,certainty:4,social:4,patience:4,resource:4,meaning:4},
    dailyLife:"大量阅读法律文书；律师方向需要极强社交能力；法考是高门槛",
-   riskTags:["法考通过率低，未过等于入错行","诉讼律师需要高压谈判能力"],
-   regrets:["以为法律很酷，没想到90%是案卷和文书","法考前几年极其煎熬"],
-   validation:["阅读一份真实的合同或判决书，看你是否感兴趣","了解法考的通过率和备考强度"]},
+   riskTags:["考证通过率低，未过等于入错行","诉讼方向需要高压谈判能力"],
+   regrets:["以为法律很酷，没想到90%是案卷和文书","考证前几年极其煎熬"],
+   validation:["阅读一份真实的合同或判决书，看你是否感兴趣","了解执照考试的通过率和备考强度"]},
   {id:"economics",name:"经济学",category:"社科",
    scoreRequire:{math:3,science:2,lang:3,eng:3,avg:3,memory:3,spatial:1},
    profile:{stress:3,certainty:3,social:3,patience:3,resource:3,meaning:3},
@@ -323,7 +295,7 @@ const MAJORS = [
    profile:{stress:3,certainty:5,social:2,patience:5,resource:2,meaning:2},
    dailyLife:"大量数字处理、凭证、报表；季末年末高压；规范严格",
    riskTags:["AI替代风险中等偏高","工作内容重复性强"],
-   regrets:["以为会计稳定，没想到职业后期被软件取代了很多工作","年审期间几乎没有个人生活"],
+   regrets:["以为会计稳定，没想到职业后期被软件取代了很多工作"],
    validation:["实习感受真实的账务处理工作，评估你对数字的耐受性"]},
   {id:"marketing",name:"市场营销",category:"社科",
    scoreRequire:{math:2,science:1,lang:3,eng:3,avg:2,memory:2,spatial:2},
@@ -337,20 +309,20 @@ const MAJORS = [
    profile:{stress:4,certainty:2,social:5,patience:3,resource:3,meaning:5},
    dailyLife:"内容创作、采访、信息筛选；快节奏；社会影响感强但收入一般",
    riskTags:["传统媒体持续萎缩","自媒体方向收入极不稳定"],
-   regrets:["没想到新闻理想与现实操作空间之间差距那么大","收入不及预期"],
+   regrets:["没想到新闻理想与现实操作空间之间差距那么大"],
    validation:["独立完成一篇深度调查报道，评估你能否承受信息混乱和截止压力"]},
   {id:"psychology",name:"心理学",category:"社科",
    scoreRequire:{math:2,science:2,lang:3,eng:3,avg:3,memory:3,spatial:1},
    profile:{stress:3,certainty:3,social:4,patience:4,resource:3,meaning:5},
    dailyLife:"临床方向高情绪劳动；研究方向大量实验设计；就业需要证书积累",
    riskTags:["咨询方向需要长期积累执照和口碑","学术研究与临床应用差距大"],
-   regrets:["以为学心理学能解决自己的问题，其实更难","咨询师的执照积累比想象中漫长"],
+   regrets:["以为学心理学能解决自己的问题，其实更难"],
    validation:["做心理咨询的来访者，体验咨询关系，评估你是否适合这个角色"]},
   {id:"education",name:"师范/教育学",category:"社科",
    scoreRequire:{math:2,science:1,lang:3,eng:2,avg:2,memory:3,spatial:1},
    profile:{stress:3,certainty:4,social:5,patience:4,resource:2,meaning:5},
    dailyLife:"课堂教学、备课、与家长沟通；情绪劳动持续；寒暑假是补偿",
-   riskTags:["寒暑假假象掩盖了高强度情绪劳动本质","职业天花板相对明确"],
+   riskTags:["假期掩盖了高强度情绪劳动本质","职业天花板相对明确"],
    regrets:["没想到家长沟通这么消耗精力","课堂管理挑战超出预期"],
    validation:["找机会给一群孩子上30分钟课，看你之后是累还是充能"]},
   {id:"architecture",name:"建筑学",category:"理工",
@@ -386,7 +358,7 @@ const MAJORS = [
    profile:{stress:4,certainty:3,social:2,patience:5,resource:4,meaning:5},
    dailyLife:"大量实验室工作；科研方向需要极强耐心；产业方向相对有限",
    riskTags:["产业出路依赖继续深造（博士）","科研回报周期极长"],
-   regrets:["做了3年发现不想读博，而本科生物技术就业很窄","科研失败率高，心理承受压力大"],
+   regrets:["做了3年发现不想读博，而本科生物技术就业很窄"],
    validation:["在实验室做一个月助理，体验真实的实验节奏"]},
   {id:"env_sci",name:"环境科学",category:"理工",
    scoreRequire:{math:3,science:4,lang:2,eng:3,avg:3,memory:3,spatial:3},
@@ -407,7 +379,7 @@ const MAJORS = [
    profile:{stress:3,certainty:1,social:2,patience:5,resource:4,meaning:5},
    dailyLife:"创作、展览、教学；经济来源极不稳定；精神自由度高",
    riskTags:["经济可持续性是最大风险","家庭经济资源是关键约束"],
-   regrets:["没有资源支撑的艺术梦是高风险路径","要接受长时间默默无闻"],
+   regrets:["没有资源支撑的艺术梦是高风险路径"],
    validation:["在没有任何外部驱动下连续创作一个月，看动力是否持续"]},
   {id:"music",name:"音乐表演/作曲",category:"艺术",
    scoreRequire:{math:1,science:1,lang:2,eng:2,avg:1,memory:4,spatial:2},
@@ -421,7 +393,7 @@ const MAJORS = [
    profile:{stress:2,certainty:3,social:3,patience:4,resource:2,meaning:4},
    dailyLife:"阅读、写作、文献研究；就业依赖考研或跨行；学术路径长",
    riskTags:["就业转化率低，需要明确方向","以为会写作就适合，实际是学术文献研究"],
-   regrets:["发现中文系不是培养作家的","就业市场对纯中文背景不友好"],
+   regrets:["发现中文系不是培养作家的"],
    validation:["阅读一篇古典文学论文，看你是否对这种研究方式感兴趣"]},
   {id:"history",name:"历史学",category:"人文",
    scoreRequire:{math:1,science:1,lang:4,eng:2,avg:2,memory:5,spatial:1},
@@ -483,30 +455,22 @@ function computeUserProfile(answers) {
   allDims.forEach(d => {
     profile[d] = weights[d] > 0 ? (sums[d] / weights[d]) * 5 : 2.5;
   });
-  // 学业综合分：取各学术维度均值
   const acadKeys = ["academic_math","academic_science","academic_lang","academic_eng","academic_avg","academic_memory"];
   profile.acad_overall = acadKeys.reduce((s,k)=>s+profile[k],0) / acadKeys.length;
-  // 理科综合
   profile.acad_stem = (profile.academic_math*1.5 + profile.academic_science*1.3 + profile.academic_eng) / 3.8;
-  // 文科综合
   profile.acad_arts = (profile.academic_lang*1.4 + profile.academic_eng + profile.academic_memory) / 3.4;
-  // 空间/动手（来自题48，academic_science维度中）
   profile.acad_spatial = answers[48] ? answers[48] : 2.5;
   return profile;
 }
 
-// 检查学业门槛 — 返回未达标的字段列表
 function checkScoreGate(userProfile, major) {
   if (!major.scoreRequire) return [];
   const req = major.scoreRequire;
   const blocked = [];
   const map = {
-    math: userProfile.academic_math,
-    science: userProfile.academic_science,
-    lang: userProfile.academic_lang,
-    eng: userProfile.academic_eng,
-    avg: userProfile.academic_avg,
-    memory: userProfile.academic_memory,
+    math: userProfile.academic_math, science: userProfile.academic_science,
+    lang: userProfile.academic_lang, eng: userProfile.academic_eng,
+    avg: userProfile.academic_avg, memory: userProfile.academic_memory,
     spatial: userProfile.acad_spatial,
   };
   const labelMap = {math:"数学",science:"理科",lang:"语文/写作",eng:"英语",avg:"总体成绩",memory:"记忆力",spatial:"空间/动手"};
@@ -531,12 +495,8 @@ function matchMajors(userProfile) {
     if (Math.abs(userProfile.meaning - major.profile.meaning) < 0.5) score = Math.min(1, score + 0.03);
     score = Math.min(1, score);
     const pct = Math.round(score * 100);
-
-    // 学业门槛检查
     const blocked = checkScoreGate(userProfile, major);
     const gateBlocked = blocked.length > 0;
-
-    // 门槛未达：强制降为高风险，且分数按未达项数量额外惩罚
     const effectivePct = gateBlocked ? Math.min(pct, 54 - blocked.length * 3) : pct;
     const sublabel = gateBlocked ? "门槛不足" :
       pct >= 88 ? "强匹配" : pct >= 78 ? "较强匹配" : pct >= 68 ? "中等匹配" : pct >= 55 ? "弱匹配" : "低匹配";
@@ -559,6 +519,41 @@ const btn = (variant) => ({
   fontSize: "0.88rem", fontFamily: "inherit",
 });
 
+// ── 新增：姓名输入界面 ──
+function NameScreen({ onConfirm }) {
+  const [name, setName] = useState("");
+  return (
+    <div style={{maxWidth:760,margin:"0 auto",padding:"4rem 1.5rem 2rem",textAlign:"center"}}>
+      <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.accent}`,color:C.accentLight,letterSpacing:2,marginBottom:"1rem"}}>开始之前</div>
+      <h2 style={{fontSize:"1.5rem",fontWeight:700,color:C.text,marginBottom:"0.5rem"}}>请输入你的姓名</h2>
+      <p style={{color:C.muted,fontSize:"0.85rem",marginBottom:"2rem"}}>仅用于内测记录，不会对外公开</p>
+      <div style={{maxWidth:360,margin:"0 auto"}}>
+        <input
+          type="text"
+          value={name}
+          onChange={e=>setName(e.target.value)}
+          placeholder="你的姓名或昵称"
+          onKeyDown={e=>e.key==="Enter"&&name.trim()&&onConfirm(name.trim())}
+          style={{
+            width:"100%", padding:"0.8rem 1rem",
+            background:C.card, border:`1px solid ${C.border}`,
+            borderRadius:6, color:C.text, fontSize:"1rem",
+            fontFamily:"inherit", outline:"none", marginBottom:"1rem",
+            boxSizing:"border-box"
+          }}
+        />
+        <button
+          onClick={()=>name.trim()&&onConfirm(name.trim())}
+          style={{...btn("primary"),width:"100%",padding:"0.8rem",fontSize:"0.95rem",opacity:name.trim()?1:0.5}}
+          disabled={!name.trim()}
+        >
+          开始测评 →
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function Welcome({ onStart }) {
   return (
     <div style={{maxWidth:760,margin:"0 auto",padding:"4rem 1.5rem 2rem",textAlign:"center"}}>
@@ -575,14 +570,14 @@ function Welcome({ onStart }) {
           </div>
         ))}
       </div>
-      <button onClick={onStart} style={{...btn("primary"),padding:"0.8rem 2.5rem",fontSize:"0.95rem"}}>开始测评 →</button>
+      <button onClick={onStart} style={{...btn("primary"),padding:"0.8rem 2.5rem",fontSize:"0.95rem"}}>下一步 →</button>
     </div>
   );
 }
 
 function QuestionPage({ qIndex, answers, onAnswer, onNext, onPrev }) {
   const q = QUESTIONS[qIndex];
-  const dimLabel = {stress:"压力耐受",certainty:"确定性偏好",social:"社交能量",patience:"执行耐心",resource:"现实资源",meaning:"意义锚点"};
+  const dimLabel = {stress:"压力耐受",certainty:"确定性偏好",social:"社交能量",patience:"执行耐心",resource:"现实资源",meaning:"意义锚点",academic_math:"学业能力",academic_science:"学业能力",academic_lang:"学业能力",academic_eng:"学业能力",academic_avg:"学业能力",academic_memory:"学业能力"};
   return (
     <div style={{maxWidth:760,margin:"0 auto",padding:"2rem 1.5rem"}}>
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"1.5rem"}}>
@@ -726,7 +721,6 @@ function ProfileSummary({ profile }) {
   );
 }
 
-// P0: 主动排除机制
 const EXCLUDE_CATEGORIES = [
   { id:"stem_hard", label:"理工硬核（大量数学/编程/实验）", majors:["cs","software_eng","data_science","electrical","mech_eng","civil_eng","architecture"] },
   { id:"medical", label:"医疗健康类（需要长期临床训练）", majors:["medicine","pharmacy","nursing","sports_sci"] },
@@ -758,7 +752,7 @@ function ExcludeScreen({ onConfirm }) {
               background: sel ? `${C.danger}18` : C.card,
               border: `1px solid ${sel ? C.danger : C.border}`,
               borderRadius:8, padding:"0.9rem 1.2rem", cursor:"pointer",
-              display:"flex", alignItems:"center", gap:12, transition:"all 0.15s"
+              display:"flex", alignItems:"center", gap:12,
             }}>
               <div style={{
                 width:20, height:20, borderRadius:4, flexShrink:0,
@@ -778,7 +772,7 @@ function ExcludeScreen({ onConfirm }) {
       </div>
       <div style={{display:"flex",gap:12,justifyContent:"center"}}>
         <button onClick={()=>onConfirm([])} style={btn("outline")}>不排除任何方向，直接看结果</button>
-        <button onClick={()=>onConfirm(excluded)} style={{...btn("primary"), opacity: excluded.length>0?1:0.6}}>
+        <button onClick={()=>onConfirm(excluded)} style={{...btn("primary"),opacity:excluded.length>0?1:0.6}}>
           {excluded.length>0 ? `排除 ${excluded.length} 类，查看结果 →` : "确认并查看结果 →"}
         </button>
       </div>
@@ -786,7 +780,73 @@ function ExcludeScreen({ onConfirm }) {
   );
 }
 
-function ResultScreen({ answers, excluded, onRestart }) {
+// ── 新增：测评结束反馈问卷 ──
+function FeedbackScreen({ onSubmit }) {
+  const [helpful, setHelpful] = useState(null);
+  const [clarity, setClarity] = useState(null);
+  const [confusing, setConfusing] = useState("");
+
+  const ratingBtns = (val, setVal, color) => [1,2,3,4,5].map(n => (
+    <button key={n} onClick={()=>setVal(n)} style={{
+      width:40, height:40, borderRadius:6, cursor:"pointer", fontFamily:"inherit",
+      fontSize:"0.9rem", fontWeight:600,
+      background: val===n ? color : "transparent",
+      border: `1px solid ${val===n ? color : C.border}`,
+      color: val===n ? "#fff" : C.textSec,
+    }}>{n}</button>
+  ));
+
+  return (
+    <div style={{maxWidth:760,margin:"0 auto",padding:"2rem 1.5rem"}}>
+      <div style={{marginBottom:"1.5rem"}}>
+        <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.gold}`,color:C.gold,letterSpacing:2,marginBottom:"0.8rem"}}>内测反馈</div>
+        <h2 style={{fontSize:"1.3rem",fontWeight:700,color:C.text,margin:"0 0 0.5rem"}}>2分钟帮我们改进</h2>
+        <p style={{color:C.muted,fontSize:"0.85rem",margin:0}}>你的反馈直接影响这套测评的下一版本</p>
+      </div>
+
+      <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"1.5rem",marginBottom:"1rem"}}>
+        <div style={{fontSize:"0.9rem",color:C.text,marginBottom:"1rem",fontWeight:500}}>这个测评对你有帮助吗？</div>
+        <div style={{display:"flex",gap:8,marginBottom:4}}>{ratingBtns(helpful,setHelpful,C.success)}</div>
+        <div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:C.muted,marginTop:4}}>
+          <span>完全没帮助</span><span>非常有帮助</span>
+        </div>
+      </div>
+
+      <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"1.5rem",marginBottom:"1rem"}}>
+        <div style={{fontSize:"0.9rem",color:C.text,marginBottom:"1rem",fontWeight:500}}>题目容易理解吗？</div>
+        <div style={{display:"flex",gap:8,marginBottom:4}}>{ratingBtns(clarity,setClarity,C.accent)}</div>
+        <div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:C.muted,marginTop:4}}>
+          <span>很难理解</span><span>非常清晰</span>
+        </div>
+      </div>
+
+      <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"1.5rem",marginBottom:"1.5rem"}}>
+        <div style={{fontSize:"0.9rem",color:C.text,marginBottom:"0.8rem",fontWeight:500}}>哪道题让你最困惑？（选填）</div>
+        <textarea
+          value={confusing}
+          onChange={e=>setConfusing(e.target.value)}
+          placeholder="题目编号或描述，比如'第23题选项不够贴近我的情况'"
+          style={{
+            width:"100%", minHeight:80, padding:"0.7rem",
+            background:"transparent", border:`1px solid ${C.border}`,
+            borderRadius:6, color:C.text, fontSize:"0.85rem",
+            fontFamily:"inherit", resize:"vertical", outline:"none",
+            boxSizing:"border-box"
+          }}
+        />
+      </div>
+
+      <button
+        onClick={()=>onSubmit({helpful,clarity,confusing})}
+        style={{...btn("primary"),width:"100%",padding:"0.8rem",fontSize:"0.95rem"}}
+      >
+        提交反馈，查看我的报告 →
+      </button>
+    </div>
+  );
+}
+
+function ResultScreen({ answers, excluded, userName, feedback, onRestart }) {
   const profile = computeUserProfile(answers);
   const ranked = matchMajors(profile);
 
@@ -794,22 +854,30 @@ function ResultScreen({ answers, excluded, onRestart }) {
     EXCLUDE_CATEGORIES.filter(c=>excluded.includes(c.id)).flatMap(c=>c.majors)
   );
 
-useEffect(() => {
-  const topMatchesData = ranked
-    .filter(r => r.level === "high" && !excludedMajorIds.has(r.major.id))
-    .slice(0, 5)
-    .map(r => ({ name: r.major.name, score: r.rawScore }));
-  fetch(SUPABASE_URL + "/rest/v1/responses", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "apikey": SUPABASE_KEY,
-      "Authorization": "Bearer " + SUPABASE_KEY,
-      "Prefer": "return=minimal"
-    },
-    body: JSON.stringify({ answers, profile, top_matches: topMatchesData, excluded })
-  });
-}, []);
+  useEffect(() => {
+    const topMatchesData = ranked
+      .filter(r => r.level === "high" && !excludedMajorIds.has(r.major.id))
+      .slice(0, 5)
+      .map(r => ({ name: r.major.name, score: r.rawScore }));
+
+    fetch(SUPABASE_URL + "/rest/v1/responses", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY,
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({
+        user_name: userName,
+        answers,
+        profile,
+        top_matches: topMatchesData,
+        excluded,
+        feedback
+      })
+    });
+  }, []);
 
   const topMatches = ranked.filter(r=>r.level==="high" && !excludedMajorIds.has(r.major.id));
   const midMatches = ranked.filter(r=>r.level==="medium" && !excludedMajorIds.has(r.major.id));
@@ -841,8 +909,8 @@ useEffect(() => {
     <div style={{maxWidth:760,margin:"0 auto",padding:"2rem 1.5rem"}}>
       <div style={{marginBottom:"1.5rem",paddingBottom:"1rem",borderBottom:`1px solid ${C.border}`}}>
         <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.accent}`,color:C.accentLight,letterSpacing:2,marginBottom:"0.5rem"}}>测评完成</div>
-        <h2 style={{fontSize:"1.5rem",fontWeight:700,margin:"0.3rem 0",color:C.text}}>你的专业方向报告</h2>
-        <p style={{color:C.muted,fontSize:"0.85rem",margin:0}}>基于长期现实兼容性模型 · 30个专业 · 含学业门槛过滤 · 分数接近的专业无显著优劣之分</p>
+        <h2 style={{fontSize:"1.5rem",fontWeight:700,margin:"0.3rem 0",color:C.text}}>{userName} 的专业方向报告</h2>
+        <p style={{color:C.muted,fontSize:"0.85rem",margin:0}}>基于长期现实兼容性模型 · 30个专业 · 含学业门槛过滤</p>
         {excluded.length>0&&(
           <div style={{marginTop:"0.6rem",fontSize:11,color:C.gold}}>
             已根据你的排除选择过滤掉 {excludedMajorIds.size} 个专业方向
@@ -901,17 +969,24 @@ export default function App() {
   const [qIndex, setQIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [excluded, setExcluded] = useState([]);
+  const [userName, setUserName] = useState("");
+  const [feedback, setFeedback] = useState(null);
   const topRef = useRef(null);
   const scrollTop = () => topRef.current?.scrollIntoView({behavior:"smooth"});
+
   const handleAnswer = (id, score) => setAnswers(a=>({...a,[id]:score}));
   const handleNext = () => {
     if (qIndex===QUESTIONS.length-1) { setScreen("exclude"); scrollTop(); return; }
     setQIndex(i=>i+1); scrollTop();
   };
   const handlePrev = () => { if(qIndex>0){setQIndex(i=>i-1);scrollTop();} };
-  const handleConfirmExclude = (ex) => { setExcluded(ex); setScreen("result"); scrollTop(); };
-  const handleRestart = () => { setScreen("welcome"); setQIndex(0); setAnswers({}); setExcluded([]); scrollTop(); };
-  const progress = screen==="quiz" ? ((qIndex+1)/QUESTIONS.length)*100 : (screen==="exclude"||screen==="result") ? 100 : 0;
+  const handleConfirmExclude = (ex) => { setExcluded(ex); setScreen("feedback"); scrollTop(); };
+  const handleFeedback = (fb) => { setFeedback(fb); setScreen("result"); scrollTop(); };
+  const handleRestart = () => { setScreen("welcome"); setQIndex(0); setAnswers({}); setExcluded([]); setUserName(""); setFeedback(null); scrollTop(); };
+
+  const progress = screen==="quiz" ? ((qIndex+1)/QUESTIONS.length)*100 :
+    (screen==="exclude"||screen==="feedback"||screen==="result") ? 100 : 0;
+
   return (
     <div ref={topRef} style={{fontFamily:"'IBM Plex Mono','Courier New',monospace",background:C.bg,color:C.text,minHeight:"100vh"}}>
       <div style={{padding:"1.5rem 2rem 1rem",borderBottom:`1px solid ${C.border}`}}>
@@ -928,11 +1003,12 @@ export default function App() {
           </div>
         </div>
       </div>
-      {screen==="welcome"&&<Welcome onStart={()=>setScreen("quiz")}/>}
+      {screen==="welcome"&&<Welcome onStart={()=>setScreen("name")}/>}
+      {screen==="name"&&<NameScreen onConfirm={(n)=>{setUserName(n);setScreen("quiz");scrollTop();}}/>}
       {screen==="quiz"&&<QuestionPage qIndex={qIndex} answers={answers} onAnswer={handleAnswer} onNext={handleNext} onPrev={handlePrev}/>}
       {screen==="exclude"&&<ExcludeScreen onConfirm={handleConfirmExclude}/>}
-      {screen==="result"&&<ResultScreen answers={answers} excluded={excluded} onRestart={handleRestart}/>}
+      {screen==="feedback"&&<FeedbackScreen onSubmit={handleFeedback}/>}
+      {screen==="result"&&<ResultScreen answers={answers} excluded={excluded} userName={userName} feedback={feedback} onRestart={handleRestart}/>}
     </div>
   );
 }
-

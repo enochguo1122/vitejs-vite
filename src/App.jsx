@@ -6,6 +6,9 @@ const SUPABASE_KEY = "sb_publishable_TpoXUuvsBQeqE1MS-CQ5rg_2DCFIdbH";
 // ── 班级列表：新增班级只需在这里加一行 ──
 const CLASSES = ["Eagles", "Harp", "Lamp"];
 
+// ── 学生访问码：改这里控制谁能进入测评 ──
+const ACCESS_CODE = "major2026";
+
 const QUESTIONS = [
   { id:1, dim:"stress", weight:1.2, text:"考试前三天，你通常会：", options:[
     {label:"高强度复习，失眠但可以接受",score:5},{label:"有计划复习，睡眠略差但还好",score:3},
@@ -631,6 +634,60 @@ function NameScreen({ onConfirm }) {
   );
 }
 
+function AccessScreen({ onPass }) {
+  const [code, setCode] = useState("");
+  const [error, setError] = useState(false);
+
+  const tryEnter = () => {
+    if (code.trim() === ACCESS_CODE) {
+      onPass();
+    } else {
+      setError(true);
+      setCode("");
+      setTimeout(() => setError(false), 2000);
+    }
+  };
+
+  return (
+    <div style={{maxWidth:760,margin:"0 auto",padding:"4rem 1.5rem 2rem",textAlign:"center"}}>
+      <div style={{display:"inline-block",fontSize:11,padding:"3px 10px",borderRadius:3,border:`1px solid ${C.accent}`,color:C.accentLight,letterSpacing:2,marginBottom:"1rem"}}>MAJOR MATCH SYSTEM</div>
+      <h2 style={{fontSize:"1.5rem",fontWeight:700,color:C.text,marginBottom:"0.5rem"}}>请输入访问码</h2>
+      <p style={{color:C.muted,fontSize:"0.85rem",marginBottom:"2rem"}}>由老师提供，输入后即可开始测评</p>
+      <div style={{maxWidth:320,margin:"0 auto"}}>
+        <input
+          type="text"
+          value={code}
+          onChange={e=>{setCode(e.target.value);setError(false);}}
+          onKeyDown={e=>e.key==="Enter"&&tryEnter()}
+          placeholder="输入访问码"
+          autoComplete="off"
+          style={{
+            width:"100%",padding:"0.8rem 1rem",
+            background:C.card,
+            border:`1px solid ${error ? C.danger : C.border}`,
+            borderRadius:6,color:C.text,fontSize:"1rem",
+            fontFamily:"inherit",outline:"none",marginBottom:"0.75rem",
+            boxSizing:"border-box",textAlign:"center",letterSpacing:"0.15em",
+            transition:"border-color .2s"
+          }}
+        />
+        {error && (
+          <div style={{fontSize:"0.82rem",color:C.danger,marginBottom:"0.75rem"}}>
+            访问码错误，请重试
+          </div>
+        )}
+        <button
+          onClick={tryEnter}
+          style={{...btn("primary"),width:"100%",padding:"0.8rem",fontSize:"0.95rem",opacity:code.trim()?1:0.4}}
+          disabled={!code.trim()}
+        >
+          进入测评 →
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function Welcome({ onStart }) {
   return (
     <div style={{maxWidth:760,margin:"0 auto",padding:"4rem 1.5rem 2rem",textAlign:"center"}}>
@@ -1209,6 +1266,7 @@ export default function App() {
   const [excluded, setExcluded] = useState([]);
   const [userName, setUserName] = useState("");
   const [className, setClassName] = useState("");
+  const [accessGranted, setAccessGranted] = useState(false);
   const topRef = useRef(null);
   const scrollTop = () => topRef.current?.scrollIntoView({behavior:"smooth"});
 
@@ -1242,11 +1300,12 @@ export default function App() {
           </div>
         </div>
       </div>
-      {screen==="welcome"&&<Welcome onStart={()=>setScreen("name")}/>}
-      {screen==="name"&&<NameScreen onConfirm={(n,cls)=>{setUserName(n);setClassName(cls);setScreen("quiz");scrollTop();}}/>}
-      {screen==="quiz"&&<QuestionPage qIndex={qIndex} answers={answers} onAnswer={handleAnswer} onNext={handleNext} onPrev={handlePrev}/>}
-      {screen==="exclude"&&<ExcludeScreen onConfirm={handleConfirmExclude} initialExcluded={excluded} onBack={excluded.length>0||answers[1]!==undefined ? ()=>{setScreen("result");scrollTop();} : null}/>}
-      {screen==="result"&&<ResultScreen answers={answers} excluded={excluded} userName={userName} className={className} onRestart={handleRestart} onEditExclude={handleEditExclude}/>}
+      {!accessGranted && <AccessScreen onPass={()=>setAccessGranted(true)}/>}
+      {accessGranted && screen==="welcome"&&<Welcome onStart={()=>setScreen("name")}/>}
+      {accessGranted && screen==="name"&&<NameScreen onConfirm={(n,cls)=>{setUserName(n);setClassName(cls);setScreen("quiz");scrollTop();}}/>}
+      {accessGranted && screen==="quiz"&&<QuestionPage qIndex={qIndex} answers={answers} onAnswer={handleAnswer} onNext={handleNext} onPrev={handlePrev}/>}
+      {accessGranted && screen==="exclude"&&<ExcludeScreen onConfirm={handleConfirmExclude} initialExcluded={excluded} onBack={excluded.length>0||answers[1]!==undefined ? ()=>{setScreen("result");scrollTop();} : null}/>}
+      {accessGranted && screen==="result"&&<ResultScreen answers={answers} excluded={excluded} userName={userName} className={className} onRestart={handleRestart} onEditExclude={handleEditExclude}/>}
     </div>
   );
 }

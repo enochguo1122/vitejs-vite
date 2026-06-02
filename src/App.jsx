@@ -780,6 +780,114 @@ function ExcludeScreen({ onConfirm }) {
   );
 }
 
+// ── 学业积累诊断组件 ──
+function AcadGapAlert({ profile }) {
+  const checks = [
+    { key:"academic_math",  label:"数学",   threshold:3.0, tip:"高等数学是理工、经济、金融、CS等方向的入场券，建议优先强化。" },
+    { key:"academic_science",label:"理科综合",threshold:2.8, tip:"物理/化学基础影响工程、医学、生命科学方向的可及性。" },
+    { key:"academic_lang",  label:"语文/写作",threshold:2.8, tip:"文字表达能力影响法学、人文、传播、教育等方向的竞争力。" },
+    { key:"academic_eng",   label:"英语",   threshold:2.8, tip:"国际化方向和顶尖院校普遍要求较高英语水平。" },
+    { key:"academic_avg",   label:"综合成绩",threshold:2.5, tip:"整体成绩是绝大多数院校录取的基础门槛，直接决定选择空间。" },
+    { key:"academic_memory",label:"记忆/积累",threshold:2.5, tip:"医学、法学、历史等方向对系统性知识积累要求极高。" },
+  ];
+  const gaps = checks.filter(c => (profile[c.key] || 0) < c.threshold);
+  if (gaps.length === 0) return null;
+
+  return (
+    <div style={{background:`${C.gold}0f`,border:`1px solid ${C.gold}55`,borderRadius:8,padding:"1.2rem 1.4rem",marginBottom:"1.5rem"}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:"0.8rem"}}>
+        <span style={{fontSize:14,color:C.gold}}>⚠</span>
+        <div style={{fontSize:12,color:C.gold,fontWeight:600,letterSpacing:1}}>学业积累诊断</div>
+      </div>
+      <div style={{fontSize:"0.85rem",color:C.textSec,lineHeight:1.8,marginBottom:"1rem"}}>
+        以下维度当前得分低于主流专业的入学门槛，这是你目前选择空间受限的主要原因。
+        这不代表方向错了——而是说明<span style={{color:C.gold}}>在正式选择前，还需要针对性积累</span>。
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+        {gaps.map(g => {
+          const val = profile[g.key] || 0;
+          const pct = Math.round((val / 5) * 100);
+          const needPct = Math.round((g.threshold / 5) * 100);
+          return (
+            <div key={g.key} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"0.8rem"}}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
+                <span style={{fontSize:"0.8rem",color:C.text,fontWeight:500}}>{g.label}</span>
+                <span style={{fontSize:"0.78rem",color:C.danger}}>当前 {val.toFixed(1)} / 需 {g.threshold.toFixed(1)}</span>
+              </div>
+              <div style={{background:C.border,borderRadius:3,height:5,marginBottom:6,position:"relative"}}>
+                <div style={{height:5,borderRadius:3,width:`${pct}%`,background:C.danger}}/>
+                <div style={{position:"absolute",top:-1,left:`${needPct}%`,width:2,height:7,background:C.gold,borderRadius:1}}/>
+              </div>
+              <div style={{fontSize:"0.75rem",color:C.muted,lineHeight:1.6}}>{g.tip}</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── 性格匹配但学业门槛不足的"潜力方向"组件 ──
+function PotentialMatches({ ranked, excludedMajorIds }) {
+  // 找出：性格原始匹配分 ≥ 72，但被学业门槛拦掉的专业
+  const potential = ranked.filter(r =>
+    r.rawScore >= 72 &&
+    r.blocked && r.blocked.length > 0 &&
+    !excludedMajorIds.has(r.major.id)
+  ).slice(0, 6);
+
+  if (potential.length === 0) return null;
+
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div style={{marginBottom:"1rem"}}>
+      <div style={{display:"flex",alignItems:"center",gap:10,margin:"1.5rem 0 1rem"}}>
+        <div style={{fontSize:12,color:"#5ab4f4",letterSpacing:2,fontWeight:600}}>◆ 潜力方向（需学业积累）</div>
+        <div style={{fontSize:11,color:C.muted}}>性格契合，但当前成绩门槛不足</div>
+      </div>
+      <div style={{background:`#5ab4f411`,border:`1px solid #5ab4f455`,borderRadius:8,padding:"1rem 1.2rem",marginBottom:"0.8rem"}}>
+        <div style={{fontSize:"0.85rem",color:C.textSec,lineHeight:1.8}}>
+          下列方向与你的性格、价值观高度匹配（原始得分 ≥72%），
+          但目前学业水平尚未达到该专业的典型入学门槛。
+          <span style={{color:"#5ab4f4"}}> 这是值得努力的方向，而不是放弃的理由。</span>
+        </div>
+      </div>
+      {potential.map(r => (
+        <div key={r.major.id} style={{background:C.card,border:`1px solid #5ab4f433`,borderRadius:8,marginBottom:8,overflow:"hidden"}}>
+          <div onClick={()=>setOpen(o=> o===r.major.id ? false : r.major.id)}
+            style={{padding:"0.9rem 1.2rem",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <div style={{display:"flex",alignItems:"center",flexWrap:"wrap",gap:6}}>
+              <span style={{background:`#5ab4f422`,color:"#5ab4f4",border:`1px solid #5ab4f455`,borderRadius:4,padding:"2px 8px",fontSize:11,fontWeight:600,marginRight:4}}>
+                潜力 {r.rawScore}%
+              </span>
+              <span style={{fontWeight:600,color:C.text,fontSize:"0.95rem"}}>{r.major.name}</span>
+              <span style={{color:C.muted,fontSize:11,background:C.border,padding:"2px 6px",borderRadius:3}}>{r.major.category}</span>
+            </div>
+            <span style={{color:C.muted,fontSize:12,flexShrink:0,marginLeft:8}}>{open===r.major.id?"▲":"▼"}</span>
+          </div>
+          {open===r.major.id&&(
+            <div style={{padding:"0 1.2rem 1.2rem",borderTop:`1px solid ${C.border}`}}>
+              <div style={{marginTop:"0.8rem",padding:"0.6rem 0.8rem",background:`${C.danger}18`,border:`1px solid ${C.danger}55`,borderRadius:6,marginBottom:"0.8rem"}}>
+                <div style={{fontSize:11,color:C.danger,fontWeight:600,marginBottom:4}}>需要提升的学业维度</div>
+                <div style={{fontSize:"0.82rem",color:C.danger}}>{r.blocked.join("、")} — 当前低于该专业最低要求</div>
+              </div>
+              <div style={{paddingTop:"0.4rem",marginBottom:"0.8rem"}}>
+                <div style={{fontSize:11,color:C.muted,marginBottom:4,letterSpacing:1}}>日常真实样貌</div>
+                <div style={{fontSize:"0.85rem",color:C.textSec,lineHeight:1.7}}>{r.major.dailyLife}</div>
+              </div>
+              <div>
+                <div style={{fontSize:11,color:C.muted,marginBottom:4,letterSpacing:1}}>✓ 现在可以做的验证</div>
+                {r.major.validation.map((v,i)=><div key={i} style={{fontSize:"0.82rem",color:C.success,padding:"2px 0"}}>· {v}</div>)}
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function ResultScreen({ answers, excluded, userName, onRestart }) {
   const profile = computeUserProfile(answers);
   const ranked = matchMajors(profile);
@@ -887,6 +995,7 @@ function ResultScreen({ answers, excluded, userName, onRestart }) {
       </div>
       <DimDisplay profile={profile}/>
       <ProfileSummary profile={profile}/>
+      <AcadGapAlert profile={profile}/>
 
       {topMatches.length>0&&<>
         <div style={{display:"flex",alignItems:"center",gap:10,margin:"1.5rem 0 1rem"}}>
@@ -899,10 +1008,16 @@ function ResultScreen({ answers, excluded, userName, onRestart }) {
       </>}
 
       {topMatches.length===0&&(
-        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"1.5rem",textAlign:"center",color:C.muted,fontSize:"0.88rem",margin:"1.5rem 0"}}>
-          排除所选方向后没有高匹配结果，建议减少排除类别或查看中匹配方向。
+        <div style={{background:`${C.gold}0f`,border:`1px solid ${C.gold}44`,borderRadius:8,padding:"1.2rem 1.4rem",margin:"1.5rem 0"}}>
+          <div style={{fontSize:"0.88rem",color:C.gold,fontWeight:600,marginBottom:"0.4rem"}}>暂无直接匹配的高适配方向</div>
+          <div style={{fontSize:"0.83rem",color:C.textSec,lineHeight:1.8}}>
+            这通常是因为当前学业积累尚未达到主流专业门槛，而不是性格不适合任何方向。
+            请查看下方「潜力方向」——那里列出了与你性格契合、但需要进一步学业提升才能进入的专业。
+          </div>
         </div>
       )}
+
+      <PotentialMatches ranked={ranked} excludedMajorIds={excludedMajorIds}/>
 
       {midMatches.length>0&&<>
         <div style={{display:"flex",alignItems:"center",gap:10,margin:"1.5rem 0 1rem"}}>

@@ -7,7 +7,7 @@ const SUPABASE_KEY = "sb_publishable_TpoXUuvsBQeqE1MS-CQ5rg_2DCFIdbH";
 const CLASSES = ["Eagles", "Harp", "Lamp"];
 
 // ── 学生访问码：改这里控制谁能进入测评 ──
-const ACCESS_CODE = "major2026";
+const ACCESS_CODE = "enochguo_only";
 
 const QUESTIONS = [
   { id:1, dim:"stress", weight:1.2, text:"考试前三天，你通常会：", options:[

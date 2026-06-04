@@ -4,7 +4,7 @@ const SUPABASE_URL = "https://jmddyrmvicpmyawhjybe.supabase.co";
 const SUPABASE_KEY = "sb_publishable_TpoXUuvsBQeqE1MS-CQ5rg_2DCFIdbH";
 
 // ── 班级列表：新增班级只需在这里加一行 ──
-const CLASSES = ["Eagles", "Harp", "Lamp"];
+const CLASSES = ["Eagles", "Harp", "Lamp","ESL"];
 
 // ── 学生访问码：改这里控制谁能进入测评 ──
 const ACCESS_CODE = "enochguo_only";

@@ -375,7 +375,14 @@ function Dashboard({ onLogout }) {
       });
       if (!r.ok) throw new Error("HTTP " + r.status);
       const data = await r.json();
-      setAllStudents(Array.isArray(data) ? data : []);
+      // 同名同班只保留最新一条（数据已按 created_at desc 排序）
+      const seen = new Set();
+      const deduped = Array.isArray(data) ? data.filter(s => {
+        const key = (s.user_name || "匿名") + "|" + (s.class_name || "");
+        if (seen.has(key)) return false;
+        seen.add(key); return true;
+      }) : [];
+      setAllStudents(deduped);
     } catch(e) { setError(e.message); }
     setLoading(false);
   };

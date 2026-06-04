@@ -11,7 +11,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 const SUPABASE_URL = "https://jmddyrmvicpmyawhjybe.supabase.co";
 const SUPABASE_KEY = "sb_publishable_TpoXUuvsBQeqE1MS-CQ5rg_2DCFIdbH";
 const TEACHER_PASS = "teacher2025";
-const CLASSES = ["Eagles", "Harp", "Lamp"];
+const CLASSES = ["Eagles", "Harp", "Lamp","ESL"];
 
 const DIMS = ["stress","certainty","social","patience","resource","meaning"];
 const DIM_LABELS = {
